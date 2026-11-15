@@ -1,0 +1,39 @@
+# Run directories: track each run's driver copy (its settings), ignore output, checkpoints, logs.
+/run/*
+!/run/*/
+/run/*/*
+!/run/*/*.jl
+
+# Data and figures
+*.nc
+*.jld2
+*.png
+*.mp4
+
+# The main Manifest.toml IS tracked (Julia 1.11 pin; see docs/julia_pin.md); plots/ is not
+plots/Manifest.toml
+plots/.CondaPkg/
+LocalPreferences.toml
+
+# Notebooks: commit the paired .jl (jupytext); outputs are stripped
+.ipynb_checkpoints/
+
+# Julia coverage / allocation files
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+
+# Logs
+slurm-*.out
+*.log
+
+# graphify (rebuilt locally by helpers/graph_package.sh)
+graphify-out/
+graphify-*/
+
+# OS and editor
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*~
