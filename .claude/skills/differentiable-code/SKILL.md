@@ -5,7 +5,7 @@ description: Checklist and test templates for writing and verifying differentiab
 
 # Differentiable code: rules and tests
 
-API details change between versions. Before relying on a signature, check it against the installed package with `code-reader`. Reference code: Oceananigans `test/reactant/simulation_gradients.jl`, NumericalEarth `examples/era5_forced_slab_land.jl`, DJ4Earth Channelanigans.
+API details change between versions. Before relying on a signature, check it against the installed package with `code-reader`. Reference code: Oceananigans `test/reactant/hydrostatic_models.jl` (gradient, lines ~49-90) and `ext/OceananigansReactantExt/Simulations/run.jl`, SpeedyWeather `ext/SpeedyWeatherReactantExt.jl` (`time_steps!`) and `test/reactant/differentation.jl`, Reactant `docs/src/tutorials/automatic-differentiation.md`, NumericalEarth `examples/era5_forced_slab_land.jl`, DJ4Earth Channelanigans.
 
 ## Concepts (explain these to the user when they first come up)
 - **Enzyme** differentiates compiled Julia (LLVM IR). `Enzyme.autodiff(Reverse, f, Active, Duplicated(x, dx), Const(p))`:
