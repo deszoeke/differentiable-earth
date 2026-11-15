@@ -12,6 +12,7 @@
 
 # The main Manifest.toml IS tracked (Julia 1.11 pin; see docs/julia_pin.md); plots/ is not
 plots/Manifest.toml
+DifferentiableEarth/Manifest.toml
 plots/.CondaPkg/
 LocalPreferences.toml
 
