@@ -19,6 +19,7 @@ A perfect-model study of coupled ocean–atmosphere predictability, from months 
 - Re-read a file right before editing it, and keep edits small and targeted. The user edits and runs code between turns.
 - **Running code:** I may run unit tests and smoke tests that finish in under ~2 minutes. The user runs experiments. Don't re-run anything to verify unless asked.
 - Numbers that matter come from saved, rerunnable code (a driver, test or plotting function), never from scratch scripts.
+- **Heavy computation goes in non-interactive driver scripts** (`drivers/`, copied into `run/<name>/`, later Slurm) that write NetCDF. Notebooks (Pluto by default, Jupyter for the HPC) read and plot. Only the toy model may be computed inside a notebook.
 - **Explain first:** before implementing each Enzyme or Reactant piece, explain the approach in chat and in `docs/technical.md`. Ask questions rather than assume; the user is new to Enzyme and Reactant.
 - **Commits:** commit and push only when asked. Use one branch per phase.
 - **Install nothing without asking.** Tools live in micromamba envs, symlinked into `~/.local/bin`: `gh`, `jupytext`, `nbstripout`. `graphify` is a uv tool.
@@ -28,7 +29,7 @@ A perfect-model study of coupled ocean–atmosphere predictability, from months 
 - Aqua and JET run in the tests.
 - **Reactant-safe traced code:** no host control flow on traced values, no scalar indexing, no logging inside traced functions; loops written with `@trace`. Constants such as regridding weights are passed in. See the `differentiable-code` skill.
 - **Output:** NetCDF only, with provenance attributes (git commit and dirty flag, settings, Julia and package versions, host). See the `netcdf-output` skill.
-- **Notebooks:** paired with `.jl` files by Jupytext; commit the `.jl` file. Never Read or grep `.ipynb` JSON.
+- **Notebooks:** Pluto `.jl` files are the default. Jupyter `.ipynb` files are paired with percent `.jl` files, and I never write an `.ipynb` (see `plots/CLAUDE.md`).
 
 ## Who reads code
 - **File and line already known:** read them directly.
