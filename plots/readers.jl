@@ -49,3 +49,22 @@ function efolding_lag(r::AbstractVector, lags)
     i = findfirst(<(exp(-1)), r)
     return i === nothing ? nothing : lags[i]
 end
+
+"""
+    cycle_stats(x, dt; smooth = 5)
+
+Oscillation statistics of series `x` sampled every `dt`: after a `smooth`-sample centered running
+mean, cycles are intervals between upward crossings of the mean. Returns
+`(; lengths, mean, std, cv)`, `cv = std/mean` (irregularity). Same as
+`DifferentiableEarth.cycle_stats` (copied so plots/ needs no model packages).
+"""
+function cycle_stats(x::AbstractVector, dt::Real; smooth::Integer = 5)
+    h = smooth ÷ 2
+    N = length(x)
+    xa = x .- mean(x)
+    y = [mean(@view xa[max(1, i - h):min(N, i + h)]) for i in 1:N]
+    up = [i for i in 1:(N - 1) if y[i] < 0 && y[i + 1] >= 0]
+    tc = [(i - 1 + y[i] / (y[i] - y[i + 1])) * dt for i in up]
+    L = diff(tc)
+    return (; lengths = L, mean = mean(L), std = std(L), cv = std(L) / mean(L))
+end

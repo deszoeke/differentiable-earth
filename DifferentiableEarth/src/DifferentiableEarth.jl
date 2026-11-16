@@ -19,5 +19,6 @@ export provenance, settings_block, write_trajectory, variable_metadata
 include("propagator.jl")
 include("toy/toy_coupled.jl")
 include("io.jl")
+include("diagnostics.jl")
 
 end # module

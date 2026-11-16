@@ -23,7 +23,7 @@ The toy model and, later, the coupled NumericalEarth model both implement this i
 |---|---|---|---|
 | Lorenz-96 | X₁…X_K | days (chaotic; 1 model time unit ≈ 5 days) | weather noise, limits atmospheric predictability |
 | slab ocean | T₁…T_K | ~90 days (λ⁻¹ = 18 units) | ocean memory, local SST persistence |
-| recharge oscillator | Tₑ, h | years (period roughly 4 years, *defaults not yet tuned*) | ENSO-like predictable signal |
+| recharge oscillator | Tₑ, h | years (period ≈ 3.7 years, irregularity CV ≈ 0.3) | ENSO-like predictable signal |
 
 Equations:
 - dX_k/dt = (X_{k+1} − X_{k−2}) X_{k−1} − X_k + F + α T_k + αₑ p_k Tₑ
@@ -46,7 +46,12 @@ Why a toy model first:
 - The analysis code (covariance B, singular vectors, targeting ΔVar, ETKF/OSSE) can be checked against exact answers in seconds.
 - The Enzyme/Reactant workflow can be learned on a model small enough that its full Jacobian fits in memory (74 × 74), so every AD result can be checked against a brute-force one.
 
-Status: implemented and tested (`DifferentiableEarth/test/test_toy.jl`). The tests cover the Lorenz-96 limit, purity, boundedness and sensitive dependence on initial conditions. **The ENSO parameters are a first guess.** A nature-run driver will check the period and amplitude, and the defaults will be tuned there.
+Status: implemented and tested (`DifferentiableEarth/test/test_toy.jl`). The tests cover the Lorenz-96 limit, purity, boundedness and sensitive dependence on initial conditions. **ENSO tuning (2026-11-15).** The first guess was a self-sustained oscillation: R = +0.002, γ = 0.02, σ = 0.01. Its period was ≈ 3.8 years, but it was too regular: the CV of cycle lengths was ≈ 0.1 over 300 years.
+- The defaults are now a damped, noise-driven oscillator: **R = −0.006, γ = 0.0156, σ = 0.03**.
+- That gives a CV of ≈ 0.3 (0.32 and 0.27 for two seeds over 300 years), about 3× the first guess, close to observed ENSO.
+- Period: 3.6–3.8 years. std(Tₑ): ≈ 0.28.
+- Sweeps: `drivers/toy_enso_sweep.jl`, run in `run/toy-enso-*`.
+- Damping shortens the period, so γ was lowered to restore it (period ∝ 1/√(γa)).
 
 ## 3. Automatic differentiation: the approach (proposed, not yet implemented)
 APIs were checked against the installed Reactant 0.2.308 and Enzyme 0.13.219 on 2026-11-15.

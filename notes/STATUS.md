@@ -14,13 +14,15 @@ _Last updated 2026-11-15._
   - `io.jl` (NetCDF with provenance);
   - `drivers/toy_nature_run.jl`;
   - `plots/` (readers, plotlib, `toy_nature_run` notebook).
-- Toy nature run, `run/toy-nature/` (50 years daily, 9 s), with default parameters. Numbers from `plots/toy_nature_run.jl`:
-  - peak Tₑ period ≈ 3.84 years;
-  - std(Tₑ) = 0.382, skewness −0.09;
-  - e-folding times: X₁ 2 days, T₁ 38 days, Tₑ 277 days.
+- Toy ENSO tuned for 3× irregularity: R = −0.006, γ = 0.0156, σ = 0.03. Over 300 years the CV of cycle lengths is ≈ 0.3, against ≈ 0.1 before (`drivers/toy_enso_sweep.jl`; `docs/technical.md` §2).
+- Toy nature run, `run/toy-nature/`, rerun with the new defaults (50 years). Numbers from `plots/toy_nature_run.jl`:
+  - peak period 3.84 years;
+  - 11 cycles, 4.3 ± 1.1 years, CV 0.265;
+  - std(Tₑ) = 0.256, skewness +0.20;
+  - e-folding times: X₁ 2 days, T₁ 45 days, Tₑ 244 days.
 
 ## Next
-1. The user reviews the nature-run notebook and possibly tunes the ENSO parameters.
+1. The user reviews the rerun nature-run notebook.
 2. The Enzyme/Reactant tutorial on the toy model (`docs/tutorial_enzyme_reactant.md`, `drivers/tutorial_ad.jl`). Agreed choices:
    - J = Tₑ at lead T, plus a slab-ocean T_k (MHW-like) as a second J;
    - leads of 2 days, 2 weeks, 2 months and 1 year;

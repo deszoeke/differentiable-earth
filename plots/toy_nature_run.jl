@@ -60,6 +60,19 @@ p = periodogram(Te_m, dt_yr)
 println("peak Tₑ period ≈ ", round(p.period[argmax(p.power)], sigdigits = 3), " years")
 
 # %% [markdown]
+# ## ENSO irregularity: cycle lengths
+# Cycles = intervals between upward zero crossings of 5-month-smoothed monthly Tₑ.
+# Irregularity = CV of cycle lengths (tuned to ≈ 0.3 with `drivers/toy_enso_sweep.jl`; observed ENSO ≈ 0.3–0.4).
+
+# %%
+c = cycle_stats(Te_m, dt_yr)
+println("cycles: ", length(c.lengths), ",  mean ", round(c.mean, digits = 2), " ± ", round(c.std, digits = 2),
+        " yr,  CV = ", round(c.cv, digits = 3))
+f_cyc = Figure(size = (600, 350)); ax_cyc = Axis(f_cyc[1, 1]; xlabel = "cycle length (years)", ylabel = "count")
+hist!(ax_cyc, c.lengths; bins = 0:0.5:8)
+f_cyc
+
+# %% [markdown]
 # ## Time scales: autocorrelation (daily data)
 
 # %%

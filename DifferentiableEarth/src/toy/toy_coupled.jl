@@ -24,8 +24,10 @@
     ToyParams(; kwargs...)
 
 Parameters of [`ToyCoupled`](@ref), in model time units (1 ≈ 5 days). Defaults give
-Lorenz-96 chaos (F = 8), ocean damping of ~90 days, and an ENSO-like period of roughly
-4 years. See the comments in `toy_coupled.jl` for the equations.
+Lorenz-96 chaos (F = 8), ocean damping of ~90 days, and a damped, noise-driven ENSO-like
+oscillation with a period of about 3.7 years and irregularity (CV of cycle lengths) of about
+0.3, tuned with `drivers/toy_enso_sweep.jl` (2026-11-15). See the comments in
+`toy_coupled.jl` for the equations.
 """
 Base.@kwdef struct ToyParams{FT}
     K::Int = 36            # number of sectors
@@ -36,9 +38,9 @@ Base.@kwdef struct ToyParams{FT}
     λ::FT = 1 / 18         # slab-ocean damping (≈ 90 days)
     β::FT = 0.02           # atmosphere → ocean heat flux
     κ::FT = 0.05           # ocean diffusion between sectors
-    R::FT = 0.002          # recharge oscillator: Bjerknes growth
-    γ::FT = 0.02           # thermocline feedback
-    σ::FT = 0.01           # wind-burst forcing of Tₑ
+    R::FT = -0.006         # recharge oscillator: Bjerknes growth (damped, noise-driven)
+    γ::FT = 0.0156         # thermocline feedback (sets the ~3.7-yr period)
+    σ::FT = 0.03           # wind-burst forcing of Tₑ (sets irregularity)
     ϵ::FT = 0.01           # cubic damping of Tₑ
     r::FT = 0.001          # thermocline damping
     a::FT = 0.022          # wind stress → thermocline
