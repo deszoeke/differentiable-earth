@@ -68,3 +68,24 @@ function cycle_stats(x::AbstractVector, dt::Real; smooth::Integer = 5)
     L = diff(tc)
     return (; lengths = L, mean = mean(L), std = std(L), cv = std(L) / mean(L))
 end
+
+"""
+    read_tutorial_ad(path)
+
+Read `run/tutorial-ad/tutorial_ad.nc` (drivers/tutorial_ad.jl). Returns a NamedTuple with
+`lead_days`, `amplitude`, `metric` (names), `sigma_clim` (state), `grad` (state × start × lead ×
+metric), `tlm_relerr` (amplitude × lead × metric), the checks `dot_test`, `fd_relerr`,
+`reactant_relerr` and timings `t_enzyme`, `t_reactant_compile`, `t_reactant_run` (by lead), and
+`attrs`.
+"""
+function read_tutorial_ad(path::AbstractString)
+    NCDataset(path) do ds
+        g(k) = Array(ds[k][:])
+        (; lead_days = g("lead_days"), amplitude = g("amplitude"), metric = String.(ds["metric"][:]),
+         sigma_clim = g("sigma_clim"), grad = Array(ds["grad"][:, :, :, :]),
+         tlm_relerr = Array(ds["tlm_relerr"][:, :, :]), dot_test = g("dot_test"), fd_relerr = g("fd_relerr"),
+         reactant_relerr = g("reactant_relerr"), t_enzyme = g("t_enzyme"),
+         t_reactant_compile = g("t_reactant_compile"), t_reactant_run = g("t_reactant_run"),
+         attrs = Dict(k => ds.attrib[k] for k in keys(ds.attrib)))
+    end
+end

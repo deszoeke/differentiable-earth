@@ -21,12 +21,22 @@ _Last updated 2026-11-15._
   - std(Tₑ) = 0.256, skewness +0.20;
   - e-folding times: X₁ 2 days, T₁ 45 days, Tₑ 244 days.
 
+- Plotting: Pluto notebooks are the default (`plots/*_pluto.jl`); Jupyter is kept for the HPC. Heavy computation goes in drivers.
+- AD layer (`src/ad.jl`: `jvp`, `vjp`, `gradient_J`, `Component`); `@trace` loop in `propagate` (copies its input first). Tests: 20 pass, including Reactant against Enzyme (`DE_TEST_REACTANT=true`).
+- AD tutorial: `docs/tutorial_enzyme_reactant.md`, `drivers/tutorial_ad.jl` (run in `run/tutorial-ad/`), `plots/tutorial_ad_pluto.jl`. Findings:
+  - the AD is correct at all leads;
+  - the toy TLM is valid for only about 1 week; derivatives grow like e^(λT), with a doubling time of about 2 days;
+  - single-trajectory adjoints are meaningless beyond about 2 weeks;
+  - Reactant is 30–600× faster per gradient after compiling.
+
 ## Next
-1. The user reviews the rerun nature-run notebook.
-2. The Enzyme/Reactant tutorial on the toy model (`docs/tutorial_enzyme_reactant.md`, `drivers/tutorial_ad.jl`). Agreed choices:
-   - J = Tₑ at lead T, plus a slab-ocean T_k (MHW-like) as a second J;
-   - leads of 2 days, 2 weeks, 2 months and 1 year;
-   - `@trace` in the package `propagate`.
+1. The user reviews the tutorial notebook.
+2. Sensitivities that survive chaos, tested on the toy:
+   - ensemble-averaged gradients;
+   - ensemble sensitivity (regression);
+   - gradients restricted to the ocean/ENSO variables, over chained short windows.
+
+   Compare them with the exact ensemble response.
 3. Build graphify graphs of the upstream package sources (`helpers/graph_package.sh`).
 4. Coupled smoke test: update `test_NumericalEarth.jl` to `EarthSystemModel`.
 

@@ -507,7 +507,7 @@ uuid = "b552c78f-8df3-52c6-915a-8e097449b14b"
 version = "1.18.0"
 
 [[deps.DifferentiableEarth]]
-deps = ["ConservativeRegridding", "Dates", "Enzyme", "KrylovKit", "LinearAlgebra", "NCDatasets", "NumericalEarth", "Oceananigans", "Pkg", "PrecompileTools", "Random", "Reactant", "SparseArrays", "SpeedyWeather", "Statistics"]
+deps = ["ConservativeRegridding", "Dates", "Enzyme", "KrylovKit", "LinearAlgebra", "NCDatasets", "NumericalEarth", "Oceananigans", "Pkg", "PrecompileTools", "Random", "Reactant", "ReactantCore", "SparseArrays", "SpeedyWeather", "Statistics"]
 path = "DifferentiableEarth"
 uuid = "aca69edf-505a-48c2-8262-fff1a8cbc812"
 version = "0.1.0"

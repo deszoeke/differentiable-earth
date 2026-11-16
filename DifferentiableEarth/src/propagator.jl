@@ -18,13 +18,20 @@ are added by the AD layer.
 abstract type AbstractPropagator end
 
 """
-    propagate(m::AbstractPropagator, x, n::Integer)
+    propagate(m::AbstractPropagator, x, n; checkpointing = false)
 
-Advance state `x` by `n` steps of `m`, returning the final state. Plain Julia loop; the
-Reactant version uses a traced loop (see the AD layer).
+Advance state `x` by `n` steps of `m`, returning the final state: the forecast map M(T) at
+lead T = n·Δt. The loop is a `ReactantCore.@trace` loop. Outside Reactant it is an ordinary
+Julia loop (plain Julia and plain Enzyme). Inside `Reactant.@compile` it becomes a single
+compiled `while` loop instead of being unrolled `n` times. `checkpointing` (`false`, `true`,
+`Reactant.Periodic(k)` or `Reactant.Binomial(b)`) sets how reverse-mode AD under Reactant
+stores the trajectory (see `docs/technical.md` §3.3); it has no effect outside Reactant.
 """
-function propagate(m::AbstractPropagator, x, n::Integer)
-    for _ in 1:n
+function propagate(m::AbstractPropagator, x0, n; checkpointing = false)
+    # copy: under Reactant, the loop-carried variable of a @trace loop is written back into the
+    # array it started from, which would overwrite the caller's x0 (found 2026-11-15).
+    x = copy(x0)
+    @trace checkpointing = checkpointing mincut = true track_numbers = false for _ in 1:n
         x = advance(m, x)
     end
     return x
