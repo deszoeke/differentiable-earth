@@ -1,4 +1,5 @@
 [deps]
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 ConservativeRegridding = "8e50ac2c-eb48-49bc-a402-07c87b949343"
 DifferentiableEarth = "aca69edf-505a-48c2-8262-fff1a8cbc812"
 Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
@@ -8,8 +9,8 @@ Oceananigans = "9e8cae18-63c1-5223-a75c-80ca9d6e9a09"
 Reactant = "3c362404-f566-11ee-1572-e11a4b42c853"
 SpeedyWeather = "9e226e20-d153-4fed-8a5b-493def4f21a9"
 
-[compat]
-julia = "~1.11"
-
 [sources]
 DifferentiableEarth = {path = "DifferentiableEarth"}
+
+[compat]
+julia = "~1.11"

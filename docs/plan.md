@@ -330,6 +330,9 @@ So the project centres on **large ensembles of a low-resolution strongly coupled
    - **Predictable component analysis** (Schneider & Griffies), a generalized eigenproblem between Σ(T), the forecast-ensemble covariance, and C, the climatological covariance. It uses the nonlinear ensemble directly.
    - **Average predictability time** (DelSole & Tippett): predictability integrated over lead.
    - **Response operators** by the fluctuation–dissipation relation, R(τ) ≈ C(τ) C(0)⁻¹.
+   - **Optimal (transient) growth.** G is non-normal, so the least-damped mode is not necessarily the most important. Temporary constructive interference of more strongly damped, non-orthogonal modes can produce maximum amplification at a finite lead.
+     - The **optimal initial structures** are the singular vectors of G(τ) = exp(Lτ), in a chosen norm, and their growth curve is max‖G(τ)‖ as a function of τ (Penland & Sardeshmukh 1995).
+     - Predictable components and APT capture this automatically, because they are built from the forecast statistics rather than from eigenvalues.
    - **Comparisons:** does the least-damped POP equal the leading predictable component, and at which leads do they diverge?
 3. **Linear baselines:** LIM, POP and PCA forecasts, and the predictability each implies.
 4. **ML emulation with rigorous predictability.** Emulators trained deterministically (MSE) learn the conditional mean. They relax toward climatology and **under-predict error and spread**, the mirror image of the TLM's unbounded growth. Remedies:
@@ -338,8 +341,12 @@ So the project centres on **large ensembles of a low-resolution strongly coupled
      - an ML (nonlinear) drift on the slow, predictable subspace (the least-damped modes);
      - a stochastic residual whose covariance obeys the fluctuation–dissipation constraint Q = −(L C₀ + C₀ Lᵀ), so the emulator's climatological variance is correct by construction and its spread cannot collapse.
    - **Generative emulators,** such as score-based diffusion conditioned on the initial slow state, to produce ensembles directly.
+   - **AD calibrates the emulator's noise.** The ML emulator is differentiable and much less chaotic than the physics, so AD can fit the structure and amplitude of its stochastic forcing directly. The method is the reparameterization trick: the noise is S(θ) ξ, with ξ sampled and held fixed during each gradient step.
+     - The loss is a proper ensemble score (CRPS or energy score) plus penalties for mismatch with C₀ and with the lagged covariances of the physics ensembles, over windows where the rollout gradients stay stable.
+     - The FDT relation supplies the starting value of Q; AD then refines it for the nonlinear drift.
+     - Stochastic optimals, the forcing patterns that excite the most variance, come from the emulator's Jacobian.
    - **Verification against the physics ensembles:** spread–skill ratio, rank histograms, and spectra of the predictable components, the APT and the least-damped modes, all by lead and season.
-5. **Targeted observations:** ΔVar from ensemble or covariance statistics (ETKF signal variance, or R(τ) in place of the TLM), validated with OSSEs. The **ocean-only adjoint** supplies interannual ocean-initial sensitivity at full ocean dimension, for siting Argo or TPOS-style observations.
+5. **Targeted observations** (adaptive observing: choosing where and when to add observations such as floats, moorings, drifters, sondes or satellite sampling; then assimilating them in OSSEs to verify the forecast improvement): ΔVar from ensemble or covariance statistics (ETKF signal variance, or R(τ) in place of the TLM), validated with OSSEs. The **ocean-only adjoint** supplies interannual ocean-initial sensitivity at full ocean dimension, for siting Argo or TPOS-style observations.
 
 **AD's supporting roles** (see the design revision above):
 - the ocean-only adjoint under prescribed or stochastic atmospheric forcing;
