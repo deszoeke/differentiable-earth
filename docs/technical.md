@@ -33,6 +33,20 @@ Equations:
 
 where ξ is the mean of (X_k − X̄) over the "equatorial" sectors 1…n_eq (a wind-burst forcing) and p_k is a wavenumber-1 teleconnection pattern.
 
+**Model statement: what the variables represent.** All variables are anomalies and nondimensional (nominal units in the NetCDF files); one model time unit ≈ 5 days.
+- **X_k (k = 1…36):** a Lorenz-96 "atmosphere" variable in longitude sector k around a latitude circle, such as a wind or geopotential anomaly. X (no subscript) is the vector of all 36. X̄ = 2.3 is its approximate climatological mean, used to form anomalies. Sectors 1…n_eq (n_eq = 4) are labelled "equatorial".
+- **T_k:** the surface (thermodynamic, slab-ocean mixed-layer) temperature anomaly under sector k. It is damped (λ), forced by an atmospheric heat flux β(X_k − X̄), diffused zonally (κ), and feeds back on the atmosphere through α T_k.
+- **Tₑ:** the eastern equatorial Pacific SST anomaly, a Niño-3-like ENSO index, as in Jin's (1997) recharge oscillator. It is *not* a basin-mean temperature or heat content. It is the eastern Pacific surface temperature, set by **upwelling** of subsurface water whose temperature depends on the thermocline depth.
+  - In the toy, the upwelling enters as the thermocline feedback γ h (a deeper thermocline means warmer upwelled water). R Tₑ represents the Bjerknes wind–SST feedback combined with damping.
+  - The nonlinearity of upwelling is represented only crudely, by the symmetric cubic damping −ϵ Tₑ³. That term bounds the oscillation but gives no El Niño/La Niña asymmetry.
+  - A quadratic nonlinear-upwelling term, such as a nonlinear dynamical-heating term ∝ Tₑ² or ∝ Tₑ h, would add the observed asymmetry if needed.
+- **h:** the western equatorial Pacific thermocline-depth anomaly, i.e. the equatorial heat content to be discharged or recharged. It responds only to the basin-scale zonal wind stress τ = μ Tₑ + ξ (dh/dt = −r h − a τ). Tₑ is driven by the thermocline feedback γ h, the Bjerknes growth/damping R, the wind bursts σ ξ and cubic damping ϵ Tₑ³.
+- **ξ:** the mean of (X_k − X̄) over the equatorial sectors: atmospheric "wind bursts", the stochastic forcing of ENSO.
+- **Couplings.** atmosphere → ENSO through ξ; ENSO → atmosphere through the teleconnection αₑ p_k Tₑ (wavenumber 1); ocean ↔ atmosphere locally through α and β.
+- **Simplifications to keep in mind:**
+  - Tₑ is *not* the slab-ocean temperature of the equatorial sectors: T₁…T₄ and Tₑ are separate variables, linked only through the atmosphere.
+  - The model has no zonal basin geometry: "eastern" and "western" are labels on Tₑ and h, not locations among the sectors.
+
 The coupling runs both ways:
 - the ocean forces the atmosphere through α T_k;
 - ENSO forces it through αₑ p_k Tₑ;
@@ -88,3 +102,59 @@ Run on the toy for every propagator; the coupled model later gets the first four
 3. **Reactant equals plain Enzyme** to round-off, which catches tracing bugs.
 4. **TLM validity against lead time:** compare M(x+δx) − M(x) with **L**δx as T grows. The atmosphere's part should fail within a few weeks, because of chaos. ENSO-related directions should stay linear much longer. This sets where adjoint results can be trusted, and motivates the ensemble-averaged gradients in the plan.
 5. **Toy only:** the full Jacobian (`Enzyme.jacobian`, 74×74) against all of the above.
+
+## 4. Sensitivities that survive chaos (toy comparison, phase 1)
+**Why.** The tutorial (`docs/tutorial_enzyme_reactant.md` §6) showed that a single-trajectory adjoint grows like e^(λT), with a doubling time of about 2 days. Beyond about 2 weeks it says nothing about the forecast we actually care about. For targeting at monthly-to-interannual leads, the right object is the sensitivity of the **expected** forecast to the **slow** initial state (the ocean T_k, Tₑ and h: 38 variables). The expectation is taken over the analysis uncertainty, which is dominated by the chaotic atmosphere:
+
+  sᵢ = ∂ E_ε[ J(M(x₀ + ε)) ] / ∂x₀ᵢ,   with i over the slow variables and ε ~ N(0, B) (analysis error).
+
+**Truth (exact ensemble answer).** For each slow variable i, centered finite differences of the ensemble mean, using paired ("common random number") ensembles:
+
+  sᵢ ≈ ( mean_k J(M(x₀ + δᵢ eᵢ + ε_k)) − mean_k J(M(x₀ − δᵢ eᵢ + ε_k)) ) / 2δᵢ,  with k = 1…N.
+
+The step is δᵢ = 0.5 s_clim,ᵢ: large enough to beat the sampling noise, and smooth because of the ensemble average. Its standard error comes from the member-by-member differences. Cost: 38 × 2 × N forecasts per initial state. That's cheap for the toy and impossible for the real model; it exists to judge the estimators below.
+
+**Estimators** (all affordable for the coupled model):
+1. **Single-trajectory adjoint** ∂J/∂x₀ at x₀: one reverse pass. Expected to fail beyond about 2 weeks.
+2. **Ensemble-mean adjoint:** the mean over members of ∂J/∂x₀ at x₀ + ε_k, with N reverse passes. Its expectation equals sᵢ, but in chaotic systems its variance grows like e^(2λT), so it may not converge at long leads (Lea, Allen & Haine 2000, *Tellus*).
+3. **Ensemble (regression) sensitivity:** regress J(T) on the initial slow perturbations across an ensemble drawn from B (Ancell & Hakim 2007). With a diagonal B this estimates sᵢ directly, using N forward runs and no adjoint.
+4. **LIM (linear inverse model):** fit dx/dt = L x on the slow variables from the nature run, with G(τ₀) = C(τ₀) C(0)⁻¹ and L = log(G)/τ₀. Then s = row of exp(L T) for J. It is statistical and state-independent, uses no model runs, and is the basis of the "modes from the covariance" analysis.
+
+**Analysis error B (diagonal):** atmosphere 0.1 s_clim; ocean T_k, Tₑ and h 0.05 s_clim. Here **s_clim** is the climatological standard deviation of each variable. (In the tutorial notebook it was called σ, which clashes with the wind-burst forcing coefficient σ.)
+
+**Leads:** 2 weeks, 2 months, 6 months, 1 year, 2 years. **Initial states:** several, at different ENSO phases.
+
+**Scores against the truth, by lead:** pattern correlation and relative RMS error over the 38 slow variables, plus the components for Tₑ and h, and cost.
+
+Code: `DifferentiableEarth/src/sensitivity.jl`, `drivers/toy_sensitivity_comparison.jl`, `plots/sensitivity_comparison_pluto.jl`.
+
+### 4.1 First results (2026-11-16, `run/toy-sensitivity/`)
+4 initial states; truth from 200 paired members with δ = 0.5 s_clim; ensemble-mean adjoint from the same 200 members; regression from 400 members; LIM fit to 50 years.
+
+Pattern correlation with the truth (J = Tₑ), pooled over states, at leads 2 wk / 2 mo / 6 mo / 1 yr / 2 yr:
+
+| estimator | 2 wk | 2 mo | 6 mo | 1 yr | 2 yr |
+|---|---|---|---|---|---|
+| single-trajectory adjoint | 0.98 | 0.10 | −0.22 | −0.11 | −0.21 |
+| ensemble-mean adjoint | 1.00 | −0.21 | −0.11 | −0.04 | −0.13 |
+| regression | 0.41 | 0.12 | 0.11 | −0.05 | 0.01 |
+| LIM | 0.99 | 0.89 | 0.66 | 0.64 | 0.41 |
+
+| truth signal/noise, rms(truth)/rms(s.e.) | 2 wk | 2 mo | 6 mo | 1 yr | 2 yr |
+|---|---|---|---|---|---|
+| J = Tₑ | 49 | 2.3 | 1.6 | 1.3 | 1.2 |
+| J = T₁ | 24 | 1.1 | 1.1 | 0.9 | 1.0 |
+
+What it shows:
+1. **At 2 weeks, the adjoints are excellent.** The ensemble-mean adjoint has a relative error of 0.04. The LIM is almost as good (0.13).
+2. **Beyond 2 weeks, both adjoints fail completely.** Their relative errors are 1e6 at 2 months and 1e50 or more at 1 year. The ensemble-mean adjoint does **not** converge, as Lea et al. (2000) predict: its variance grows like e^(2λT).
+3. **Regression is poor at every lead.** The initial slow-variable spread is small (0.05 s_clim), so the regression signal is buried in atmosphere-driven variance of J. This is an intrinsic weakness of ensemble sensitivity when analysis errors in the slow variables are small.
+4. **The LIM is the only estimator that keeps skill at long leads** (Tₑ: 0.89 at 2 months, 0.64 at 1 year).
+5. **Caveat: the truth is noise-dominated beyond about 2 months** (signal/noise ≈ 1–2, and ≈ 1 for T₁). The long-lead scores therefore under-state every estimator, and the T₁ results beyond 2 weeks can't be interpreted. The truth needs a redesign (§4.2).
+
+### 4.2 Next: a resolvable truth (proposed)
+Estimate the expected-forecast sensitivity along a few **directions** instead of 38 individual variables, with many more members:
+- **Directions:** Tₑ, h, and the leading slow-variable patterns (LIM/EOF modes).
+- **Members:** about 2000.
+
+Score the estimators by projecting them onto the same directions. Optionally add a hybrid estimator: an adjoint over the short TLM-valid window (about a week), then the LIM beyond it.

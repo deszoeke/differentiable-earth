@@ -29,14 +29,16 @@ _Last updated 2026-11-15._
   - single-trajectory adjoints are meaningless beyond about 2 weeks;
   - Reactant is 30–600× faster per gradient after compiling.
 
-## Next
-1. The user reviews the tutorial notebook.
-2. Sensitivities that survive chaos, tested on the toy:
-   - ensemble-averaged gradients;
-   - ensemble sensitivity (regression);
-   - gradients restricted to the ocean/ENSO variables, over chained short windows.
+- Toy sensitivity comparison, first run (`run/toy-sensitivity/`; `docs/technical.md` §4.1; `plots/sensitivity_comparison_pluto.jl`):
+  - adjoints are excellent at 2 weeks and fail beyond;
+  - the ensemble-mean adjoint does not converge;
+  - regression is poor;
+  - the LIM keeps skill: Tₑ pattern correlation 0.64 at 1 year;
+  - but the truth is noise-dominated beyond about 2 months, so the run needs a redesign.
 
-   Compare them with the exact ensemble response.
+## Next
+1. The user reviews the comparison notebook.
+2. A resolvable truth (§4.2): sensitivities along a few directions with about 2000 members, plus a hybrid estimator (short adjoint, then LIM).
 3. Build graphify graphs of the upstream package sources (`helpers/graph_package.sh`).
 4. Coupled smoke test: update `test_NumericalEarth.jl` to `EarthSystemModel`.
 

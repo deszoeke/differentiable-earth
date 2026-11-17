@@ -89,3 +89,24 @@ function read_tutorial_ad(path::AbstractString)
          attrs = Dict(k => ds.attrib[k] for k in keys(ds.attrib)))
     end
 end
+
+"""
+    read_sensitivity_comparison(path)
+
+Read `run/toy-sensitivity/toy_sensitivity_comparison.nc` (drivers/toy_sensitivity_comparison.jl).
+Sensitivities are `slow × lead × metric × start` (`lim`: `slow × lead × metric`); scores `corr`
+and `relerr` are `estimator × lead × metric`.
+"""
+function read_sensitivity_comparison(path::AbstractString)
+    NCDataset(path) do ds
+        g(k) = Array(ds[k][:])
+        a4(k) = Array(ds[k][:, :, :, :])
+        (; lead_days = g("lead_days"), slow = g("slow"), metric = String.(ds["metric"][:]),
+         estimator = String.(ds["estimator"][:]), s_clim = g("s_clim"),
+         truth = a4("truth"), truth_se = a4("truth_se"), single_adjoint = a4("single_adjoint"),
+         ensemble_mean_adjoint = a4("ensemble_mean_adjoint"), ensemble_mean_adjoint_se = a4("ensemble_mean_adjoint_se"),
+         regression = a4("regression"), lim = Array(ds["lim"][:, :, :]),
+         corr = Array(ds["corr"][:, :, :]), relerr = Array(ds["relerr"][:, :, :]),
+         attrs = Dict(k => ds.attrib[k] for k in keys(ds.attrib)))
+    end
+end

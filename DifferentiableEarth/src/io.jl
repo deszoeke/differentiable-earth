@@ -31,12 +31,15 @@ const PROVENANCE_PACKAGES = ("Reactant", "Enzyme", "Oceananigans", "SpeedyWeathe
                              "ConservativeRegridding", "DifferentiableEarth", "NCDatasets")
 
 function package_versions()
-    deps = Pkg.dependencies()
+    # read the active Manifest directly (no dependence on which packages are installed)
+    manifest = joinpath(dirname(Base.active_project()), "Manifest.toml")
+    isfile(manifest) || return "unknown (no Manifest.toml)"
+    deps = get(TOML.parsefile(manifest), "deps", Dict())
     v = String[]
-    for (_, d) in deps
-        d.name in PROVENANCE_PACKAGES && push!(v, string(d.name, "=", d.version))
+    for name in PROVENANCE_PACKAGES
+        haskey(deps, name) && push!(v, string(name, "=", get(first(deps[name]), "version", "path")))
     end
-    return join(sort(v), ", ")
+    return join(v, ", ")
 end
 
 """

@@ -40,6 +40,7 @@ All plotting for differentiable-earth. The root `CLAUDE.md` covers the project's
   - New cells need fresh UUIDs.
   - Each variable is defined in exactly one cell; use `begin ... end` for several statements and `let` for local scratch.
   - Qualify names that clash between Makie and PlutoUI, e.g. `PlutoUI.Slider`.
+  - **Put each `@bind` widget in its own plain cell, not inside `md"..."`.** Pluto's markdown parser cuts `$(...)` interpolations at `;` and at `_` (e.g. `show_value`). Similarly, build tables with `Markdown.parse(...)` in a `let` block, not with nested strings in `md`.
 - **Check:** after editing a Pluto notebook, run it headlessly and confirm no cells error (`Pluto.SessionActions.open(Pluto.ServerSession(), path; run_async = false)`, then check `cell.errored`).
 
 ## Working rules

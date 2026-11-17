@@ -8,6 +8,7 @@ description: How to run, test, precompile and inspect Julia in the differentiabl
 ## Versions
 - **Julia 1.11.9 is pinned.** A juliaup override applies in this repo, so `julia` starts 1.11 here. In scripts and jobs, write `julia +1.11` explicitly. Rationale and unpin criteria: `docs/julia_pin.md`. Never change the pin casually.
 - Check with `julia --version` (expect 1.11.9) and `juliaup status`.
+- **The override applies only inside this repo.** From any other directory (e.g. a scratch folder), plain `julia` starts the default 1.13, which recompiles everything for minutes and can fail (2026-11-15: `MbedTLS_jll` is a 1.11 stdlib, absent in 1.13). Outside the repo, always write `julia +1.11`.
 
 ## Environments
 | Environment | Path | Contents |

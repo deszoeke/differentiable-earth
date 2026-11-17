@@ -7,9 +7,12 @@
 #
 # State x = [X₁…X_K ; T₁…T_K ; Tₑ ; h]
 #   X_k  atmosphere sector variable (Lorenz-96)
-#   T_k  slab-ocean temperature anomaly under sector k
-#   Tₑ   eastern equatorial Pacific temperature anomaly (recharge oscillator)
-#   h    western Pacific thermocline depth anomaly (recharge oscillator)
+#   T_k  surface (thermodynamic, slab-ocean mixed-layer) temperature anomaly under sector k
+#   Tₑ   eastern equatorial Pacific SST anomaly (Niño-3-like index; recharge oscillator, Jin 1997),
+#        set by upwelling of thermocline water (γ h); −ϵTₑ³ crudely stands in for nonlinear upwelling
+#   h    western equatorial Pacific thermocline-depth anomaly (recharge oscillator), driven by
+#        basin-scale zonal wind stress τ = μ Tₑ + ξ
+# Full statement of the model and its assumptions: docs/technical.md §2.
 #
 #   dX_k/dt = (X_{k+1} − X_{k−2}) X_{k−1} − X_k + F + α T_k + αₑ p_k Tₑ
 #   dT_k/dt = −λ T_k + β (X_k − X̄) + κ (T_{k+1} − 2T_k + T_{k−1})
@@ -39,11 +42,11 @@ Base.@kwdef struct ToyParams{FT}
     β::FT = 0.02           # atmosphere → ocean heat flux
     κ::FT = 0.05           # ocean diffusion between sectors
     R::FT = -0.006         # recharge oscillator: Bjerknes growth (damped, noise-driven)
-    γ::FT = 0.0156         # thermocline feedback (sets the ~3.7-yr period)
+    γ::FT = 0.0156         # thermocline feedback h → Tₑ (sets the ~3.7-yr period)
     σ::FT = 0.03           # wind-burst forcing of Tₑ (sets irregularity)
     ϵ::FT = 0.01           # cubic damping of Tₑ
     r::FT = 0.001          # thermocline damping
-    a::FT = 0.022          # wind stress → thermocline
+    a::FT = 0.022          # wind stress → thermocline (discharge)
     μ::FT = 1.0            # Tₑ → wind stress coupling
     neq::Int = 4           # number of equatorial sectors (1:neq)
 end
@@ -131,9 +134,9 @@ end
 
 variable_metadata(m::ToyCoupled) = (
     atmosphere = (units = "1", long_name = "Lorenz-96 atmosphere sector variable X", dim = "sector"),
-    ocean = (units = "K", long_name = "slab-ocean temperature anomaly T", dim = "sector"),
-    Te = (units = "K", long_name = "eastern equatorial temperature anomaly (recharge oscillator)", dim = nothing),
-    h = (units = "m", long_name = "western thermocline depth anomaly (recharge oscillator, nondimensional scale)", dim = nothing),
+    ocean = (units = "K", long_name = "surface (slab-ocean mixed-layer) temperature anomaly T_k", dim = "sector"),
+    Te = (units = "K", long_name = "eastern equatorial Pacific SST anomaly Te (recharge oscillator)", dim = nothing),
+    h = (units = "m", long_name = "western equatorial Pacific thermocline depth anomaly h (recharge oscillator, nondimensional scale)", dim = nothing),
 )
 
 """
