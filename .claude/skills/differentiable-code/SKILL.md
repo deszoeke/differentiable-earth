@@ -25,6 +25,7 @@ API details change between versions. Before relying on a signature, check it aga
 - Build constant operators on the host (for example the ConservativeRegridding weights, as sparse or banded matrices) and pass them in as arguments.
 - Allocate outside the traced region. In-place updates of traced arrays are fine.
 - **`copy` the input before a `@trace` loop.** The loop-carried variable is written back into the array it started from, so `x = advance(m, x)` inside `@trace for` overwrites the caller's input. This happens even with `donated_args = :none`. Found 2026-11-15, when it made the Reactant JVP 100% wrong. Reactant's own examples do `rk4_steps(copy(x), ...)`.
+- **A compiled call advances the model object it is given** (Oceananigans: velocities, η, clock). For finite-difference checks or repeated evaluations, build a fresh model for every call. Otherwise each evaluation starts from the previous end state, and the finite differences stop converging as ε shrinks (2026-11-16; fixed, then 1e-12 agreement).
 - **Compiled thunks take no keyword arguments.** Give every function that will be `@compile`d an all-positional method; keyword values are baked in at compile time.
 - **Gradient check results (toy, 56 steps):** Reactant against plain Enzyme agrees to ~1e-12, not 1e-16, because XLA reorders floating-point operations. Use `rtol ≈ 1e-9`.
 - Smooth non-differentiable switches where gradients matter (softplus or sigmoid with a sharpness parameter); keep the original as an option.

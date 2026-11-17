@@ -9,7 +9,7 @@ _Last updated 2026-11-15._
 - Agents (`code-reader`, `upstream-scout`) and skills (`julia-env`, `differentiable-code`, `add-phenomenon`, `netcdf-output`) written.
 
 - Main environment resolved on 1.11.9 at the target versions; Manifest committed (main, b856558).
-- Branch `phase1-toy-model`:
+- Phase 1 (tag `phase1-toy-done`):
   - `ToyCoupled` (Lorenz-96 + slab ocean + recharge oscillator) and the `AbstractPropagator` interface, with 11 passing tests;
   - `io.jl` (NetCDF with provenance);
   - `drivers/toy_nature_run.jl`;
@@ -36,7 +36,7 @@ _Last updated 2026-11-15._
   - the LIM keeps skill: Tₑ pattern correlation 0.64 at 1 year;
   - but the truth is noise-dominated beyond about 2 months, so the run needs a redesign.
 
-- Phase 2 (`phase2-coupled-model`):
+- Phase 2 (tag `phase2-regrid-done`; all work now on `main`):
   - coupled smoke test passes (`run/coupled-smoke/`);
   - regridding weights extracted, checked (transpose 4e-15, constant-preserving, identical to `ConservativeRegridding.regrid!`) and saved (`run/regrid-weights/`), through the `DifferentiableEarthCoupledExt` extension.
 - Reactant atmosphere and ocean checks are written but need CUDA.jl (deferred).

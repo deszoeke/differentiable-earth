@@ -39,8 +39,11 @@ model_kwargs(::Val{:passive}) = (; buoyancy = nothing, tracers = :T)
 model_kwargs(::Val{:buoyant}) = (; buoyancy = SeawaterBuoyancy(equation_of_state = LinearEquationOfState(), constant_salinity = 35),
                                   tracers = :T, coriolis = HydrostaticSphericalCoriolis(),
                                   momentum_advection = VectorInvariant())
-model = HydrostaticFreeSurfaceModel(grid; free_surface = ExplicitFreeSurface(), timestepper = :QuasiAdamsBashforth2,
-                                    model_kwargs(Val(dynamics))...)
+# A compiled call advances the model it is given (velocities, η, clock), so every evaluation below
+# uses a freshly built model: otherwise each starts from the previous call's end state.
+new_model() = HydrostaticFreeSurfaceModel(grid; free_surface = ExplicitFreeSurface(), timestepper = :QuasiAdamsBashforth2,
+                                          model_kwargs(Val(dynamics))...)
+model = new_model()
 dmodel = Enzyme.make_zero(model)
 
 T_init = CenterField(grid)
@@ -68,7 +71,8 @@ t_cg = @elapsed compiled_grad = Reactant.@compile raise = true raise_first = tru
 t_cl = @elapsed compiled_loss = Reactant.@compile raise = true raise_first = true sync = true loss(model, T_init, Δt, nsteps)
 @info "compiled" t_grad_compile = t_cg t_loss_compile = t_cl
 
-dT, J0 = compiled_grad(model, dmodel, T_init, dT_init, Δt, nsteps)
+m = new_model()
+dT, J0 = compiled_grad(m, Enzyme.make_zero(m), T_init, dT_init, Δt, nsteps)
 G = Array(interior(dT))
 @info "gradient" loss = Float64(J0) finite = all(isfinite, G) maxabs = maximum(abs, G)
 
@@ -78,7 +82,7 @@ T0 = Array(interior(T_init))
 function J_of(Tarray)
     Tp = CenterField(grid)
     set!(Tp, Tarray)
-    return Float64(compiled_loss(model, Tp, Δt, nsteps))
+    return Float64(compiled_loss(new_model(), Tp, Δt, nsteps))
 end
 rows = Tuple{Float64, Float64, Float64}[]
 for ε in (1e-2, 1e-3, 1e-4, 1e-5)

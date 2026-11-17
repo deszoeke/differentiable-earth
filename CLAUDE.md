@@ -21,7 +21,7 @@ A perfect-model study of coupled ocean–atmosphere predictability, from months 
 - Numbers that matter come from saved, rerunnable code (a driver, test or plotting function), never from scratch scripts.
 - **Heavy computation goes in non-interactive driver scripts** (`drivers/`, copied into `run/<name>/`, later Slurm) that write NetCDF. Notebooks (Pluto by default, Jupyter for the HPC) read and plot. Only the toy model may be computed inside a notebook.
 - **Explain first:** before implementing each Enzyme or Reactant piece, explain the approach in chat and in `docs/technical.md`. Ask questions rather than assume; the user is new to Enzyme and Reactant.
-- **Commits:** commit and push only when asked. Use one branch per phase.
+- **Commits:** commit and push only when asked. Work on `main` on every machine (Mac and HPC push and pull the same branch). Mark phase milestones with annotated tags (`phaseN-...`, pushed with `git push origin --tags`). Use a branch only for a genuinely risky experiment, and delete it when done. Close Pluto notebooks before any branch switch: Pluto re-saves files git is changing.
 - **Install nothing without asking.** Tools live in micromamba envs, symlinked into `~/.local/bin`: `gh`, `jupytext`, `nbstripout`. `graphify` is a uv tool.
 
 ## Code standards

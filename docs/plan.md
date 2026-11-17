@@ -214,7 +214,7 @@ differentiable-earth/
   - **TF32:** XLA uses TF32 for Float32 matrix products by default. Use Float64, or turn TF32 off, for gradient checks.
   - **First target: A100** (x86_64, better tested). Then try GH200 for memory, at 96 GB or more.
 - **JIT:** recompiling after a change is acceptable. Reactant `@compile` happens at run time inside the driver, and the compiled thunk is reused within a run.
-- **Git:** GitHub repo, created by the user. Push and pull between the laptop and the HPC. Commit and push only when asked, with one branch per phase.
+- **Git:** GitHub repo, created by the user. Push and pull between the laptop and the HPC. Commit and push only when asked. Work on `main`; tag phase milestones; branch only for risky experiments (changed from one branch per phase on 2026-11-16).
 
 ### plots/ extension (improving on ekman-astz `plot/`)
 - **Library: CairoMakie + GeoMakie (decided).** Every package in the stack plots through Makie, with no PythonPlot support:
@@ -357,7 +357,7 @@ So the project centres on **large ensembles of a low-resolution strongly coupled
 Reactant is kept mainly for **GPU performance portability of the large ensembles**.
 
 **Revised phases:**
-1. **Toy model:** done (`phase1-toy-model`). AD validated; the chaos limit and the failure of ensemble-mean adjoints shown; LIM and regression baselines.
+1. **Toy model:** done (tag `phase1-toy-done`). AD validated; the chaos limit and the failure of ensemble-mean adjoints shown; LIM and regression baselines.
 2. **Coupled model, forward:**
    - smoke test: done;
    - regridding weights: done, saved to NetCDF, adjoint = transpose;
