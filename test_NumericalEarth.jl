@@ -31,4 +31,4 @@ atmos_model = PrimitiveWetModel(spectral_grid)
 atmos_sim = SpeedyWeather.Simulation(atmos_model) # newer Simulation generator
 atmosphere = atmosphere_simulation(spectral_grid; stop_time=stop_time)
 
-coupled_model = OceanSeaIceModel(ocean; atmosphere)
+coupled_model = EarthSystemModel(; atmosphere, sea_ice = default_sea_ice(), ocean)   # NumericalEarth ≥ 0.9

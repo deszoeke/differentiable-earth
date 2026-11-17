@@ -307,5 +307,9 @@ differentiable-earth/
 3. **Long-lead coupled response from statistics:** the fluctuation–dissipation response operator R(τ) ≈ C(τ) C(0)⁻¹, built from the strongly coupled lagged covariance (aim 1), with the LIM as one form. Long-lead targeting through ensemble-transform signal variance or ΔVar computed with R(τ) in place of the TLM.
 4. **Hybrid / chaining:** a short-window adjoint, then a covariance-based response.
 5. **Reserve:** least-squares shadowing (LSS/NILSS) for exact derivatives of long-time statistics, if ever needed.
+6. **Jacobian about a fixed basic state (for linear and stochastic atmosphere models).** AD gives the exact tendency Jacobian A = ∂f/∂x evaluated at the climatological mean x̄. Unlike the trajectory TLM, this is a time-invariant operator. With eddy damping (Farrell & Ioannou), A is stable and non-normal: disturbances grow transiently, then decay.
+   - A driven by noise is a linear stochastic atmosphere. Its stochastic optimals and covariance can be compared with the coupled covariance B.
+   - Gradients of statistics over short windows can calibrate the damping and the noise.
+   - Caveat: x̄ is not a model solution, and the damping is a modelling choice.
 
 **Unchanged:** the coupled model must still be differentiable, for roles 1 and 2 and for later calibration and hybrid machine learning. So phase 4 still goes ahead: precomputed regridding weights and Reactant ports of the atmosphere, the ocean and the coupler.

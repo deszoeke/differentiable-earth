@@ -31,6 +31,7 @@ description: How to run, test, precompile and inspect Julia in the differentiabl
 ## Time limits and etiquette
 - I may run unit tests and smoke tests under about 2 minutes. Give the Bash tool a `timeout`. Run longer jobs (`Pkg.add`/`instantiate`/first precompile of Reactant, which take many minutes) with `run_in_background`, and tell the user.
 - The user runs experiments. Don't re-run anything to verify unless asked.
+- **Long local runs: prefix `caffeinate -i`** (e.g. `caffeinate -i julia --project=../.. driver.jl`). Without it, macOS throttles or suspends background runs when the machine idles or sleeps. On 2026-11-16 a 5-day coupled smoke test used 23% CPU over 43 min, and two truth computations took about 3.5 h instead of 70 s.
 - Reactant's first `@compile` of a function takes seconds to minutes. Recompiling after a code change is expected and acceptable.
 
 ## Changing packages
