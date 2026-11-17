@@ -45,8 +45,28 @@ _Last updated 2026-11-15._
 - Plain Enzyme on SpeedyWeather segfaults on Julia 1.11, so unpin criterion 3 is met (`docs/julia_pin.md`).
 - **Plan re-scoped** (`docs/plan.md`, "Re-scoped aims and phases"): ensembles plus the strongly coupled covariance (least-damped modes, PCA/APT, response operators), ML emulation with rigorous predictability, AD in supporting roles.
 
+- **HPC smoke test** (2026-11-16, job 7432005, `rime`, an aarch64 GH200 node, Grace CPU only, 8 threads), `run/coupled-smoke-hpc/`:
+  - build 223 s; first step 37.5 s (compilation);
+  - **≈ 0.39 s per 40-minute coupled step** (179 steps in about 70 s);
+  - SST identical to the Mac run.
+- **Implied cost:**
+  - about 1.4 h per member-year, about 17 simulated years per day per 8-core job, about 150 SYPD per 72-core node if members scale independently (unmeasured);
+  - 2-year ensembles of 30 members × 4 seasons × 20 years (4800 member-years) ≈ 32 node-days;
+  - a decadal check of 5 starts × 20 members × 10 years ≈ 7 node-days;
+  - a 500-year nature run takes about 30 days of wall time as one 8-core job, so single long runs need speed-ups.
+  - Likely speed-ups: a longer coupled Δt with the atmosphere sub-stepped (the ocean currently steps every 40 min); thread scaling; GPU.
+- **Ensemble sampling** (user's point, 2026-11-17):
+  - pooled over 4 seasons × 20 years of starts, the 30-member ensembles give about 2300 degrees of freedom for the **noise** covariance Σ(T) at every lead (29 per start × 80 starts). That is ample for strongly coupled cross-covariances, though seasonal and state dependence reduce it (about 580 per season).
+  - The **signal** covariance and the climatological C(0) and C(τ) have only about 80 correlated ensemble-mean samples, so the effective number is the count of independent slow states. These need the long nature run.
+  - The coupled state is 10⁵–10⁶ variables, so analysis works in a reduced space of about 100–300 EOFs.
+- **Decadal predictability** (idea, not yet in the plan):
+  - extrapolate with the LIM, G(τ) = C(τ) C(0)⁻¹ = exp(Lτ), Q = −(L C0 + C0 Lᵀ), with the τ-test;
+  - diagnostic potential predictability from a several-century control run with realistic geometry;
+  - check against a few 10-year ensembles. Caveat: AMOC and decadal ocean physics at 2°.
+- **Literature:** `docs/novelty.md` (assessment) and `docs/references.md` (56 AMS-style references with DOIs). Consensus thread: https://consensus.app/search/literature-review-to-assess-the-novelty-of-a-plann/uihD0upqS4-DK0PLLx3Jsg/ . The Elicit connector is unavailable (no API access on the plan).
+
 ## Next
-1. A multi-decade low-resolution coupled nature run, plus a timing study (with `caffeinate`).
+1. A timing study: atmosphere and ocean cost per step; a longer coupled Δt with the atmosphere sub-stepped; thread scaling; later GPU. Then a multi-decade low-resolution coupled nature run.
 2. Realism checks for the Tier 1 phenomena in the nature run.
 3. Large ensembles, then the covariance and predictable modes.
 

@@ -1,5 +1,7 @@
 # What is novel? (working notes, 2026-11-16; to be revised)
 
+Full citations with DOIs, in AMS style: `docs/references.md`.
+
 Most individual components are established. The novelty lies in their combination, and in a perfect-model benchmark the field lacks. **Status: claims revised after a literature check on 2026-11-16 (Consensus search). See below.**
 
 ## Established (not novel by themselves)
@@ -137,10 +139,33 @@ This extends Mahajan et al. (2026), which covers 10-day spread and covariance, a
   - nudging can't be applied in forecasts, since there are no future data to nudge toward.
 - **Implication (inferred):** this does not supersede our ocean-only adjoint (role 2). In effect it *is* an ocean adjoint with a damped atmosphere. Untested middle ground: nudge the atmosphere toward the ensemble mean or climatology to approximate a stochastically forced ocean adjoint.
 
-**Newly flagged competitor (reported by the subagent; not yet checked):** Wu et al. (2026, arXiv:2608.10277), a *coupled stochastic* emulator, ACE2S plus Samudra, of E3SMv3. It is evaluated on the ENSO spectrum and variability rather than on predictability. Read it in full next.
+**Wu et al. (2026, arXiv preprint 2608.10277), "Stochastic Emulation of a Fully Coupled Preindustrial E3SMv3 Simulation" (full citation in `docs/references.md`).** Read from the arXiv HTML, via WebFetch summaries, by a subagent on 2026-11-16.
+- **Models:**
+  - ACE2S atmosphere (1°, 8 levels, 6 h step) coupled to Samudra ocean and sea ice (1°, 19 levels, 5-day step);
+  - trained on 90 years of an E3SMv3 preindustrial control;
+  - exchanged fields: 5-day-mean fluxes and wind stress to the ocean; SST and sea ice to the atmosphere.
+- **Stochasticity:**
+  - noise is injected **in the atmosphere only** (ACE2S); "No additional noise is injected into" Samudra;
+  - trained with fair CRPS (2 members) plus a spectral energy score, then the coupled system is fine-tuned jointly;
+  - **no link to covariance or FDT.**
+- **Evaluation:** free-running 500-year rollouts only.
+  - Mean state, extremes, ENSO spectra and variability.
+  - **No initialized forecasts and no predictability diagnostics.**
+  - Stochastic training improves variability (e.g. Gulf Stream SST std: E3SMv3 1.27 K, deterministic 0.55 K, stochastic 0.74 K) but variability stays too low.
+  - ENSO has up to 50% too little power at 1.5–2 years.
+  - **One deterministic seed has a 6.6× too-strong, regular ENSO with good RMSE.** The authors: "mean-state metrics alone cannot detect this failure mode."
+  - E3SMv3's own ENSO spectral peak varies about 4× between 40-year blocks.
+- **Speed:** about 1100 simulated years per day on one H100.
+- **Future work they list:** historical forcing; comparison with a large *historical* (forced, not initialized) ensemble; noise in the ocean emulator.
+- **Code and data:** emulator code on Zenodo (doi:10.5281/zenodo.21878017); checkpoint, initial conditions and forcing on Hugging Face (allenai/SamudrACE-E3SMv3).
+- **For us:**
+  - **Not pre-empted.** No initialized, perfect-model predictability scoring and no FDT-constrained noise.
+  - **Strong motivating evidence:** climate statistics and RMSE miss a wrong ENSO.
+  - Cite it as the leading stochastic coupled emulator.
+  - Our differences: initialized ensembles; a coupled noise covariance Q that includes the ocean; a differentiable model; lagged coupled covariances scored by lead.
 
 ### Updated assessment
 - **(a) A perfect-model coupled predictability benchmark at S2S-to-interannual leads, using predictability diagnostics: still open.** Mahajan et al. supply the motivating result (deterministic emulators under-disperse) but stay atmosphere-only, deterministic, and within 10 days.
 - **(b) An FDT/Lyapunov-constrained noise covariance for emulators: not done in Falasca & Zanna,** who fit Σ from residuals. But they name "FDT response as a calibration target" as future work, so this needs to be distinguished quickly.
 - **(c) A nudged coupled adjoint is not a better route for forecast targeting.** It reduces to an ocean adjoint with a damped atmosphere, which supports role 2. Nudging toward the ensemble mean is a possible variant to test.
-- **Next:** read Wu et al. 2026 (ACE2S plus Samudra) in full; it may be the closest coupled-emulator competitor.
+- **(d) Wu et al. 2026 (stochastic coupled emulator) does not pre-empt (a) or (b).** It strengthens the motivation, since a wrong ENSO can hide behind good RMSE and climate statistics.
