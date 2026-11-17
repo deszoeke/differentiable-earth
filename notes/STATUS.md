@@ -39,7 +39,10 @@ _Last updated 2026-11-15._
 - Phase 2 (tag `phase2-regrid-done`; all work now on `main`):
   - coupled smoke test passes (`run/coupled-smoke/`);
   - regridding weights extracted, checked (transpose 4e-15, constant-preserving, identical to `ConservativeRegridding.regrid!`) and saved (`run/regrid-weights/`), through the `DifferentiableEarthCoupledExt` extension.
-- Reactant atmosphere and ocean checks are written but need CUDA.jl (deferred).
+- Reactant checks pass against finite differences:
+  - **ocean:** Oceananigans on a LatitudeLongitudeGrid with buoyancy and Coriolis, 1e-12 (`run/reactant-ocean/`);
+  - **atmosphere:** SpeedyWeather PrimitiveWet T32L8 Float64, 3e-8 (`run/reactant-atmosphere/`).
+- Plain Enzyme on SpeedyWeather segfaults on Julia 1.11, so unpin criterion 3 is met (`docs/julia_pin.md`).
 - **Plan re-scoped** (`docs/plan.md`, "Re-scoped aims and phases"): ensembles plus the strongly coupled covariance (least-damped modes, PCA/APT, response operators), ML emulation with rigorous predictability, AD in supporting roles.
 
 ## Next
@@ -48,4 +51,4 @@ _Last updated 2026-11-15._
 3. Large ensembles, then the covariance and predictable modes.
 
 ## Open questions
-- Add CUDA.jl to the root environment for the Reactant checks: deferred by the user.
+- Unpin Julia 1.11 and move to 1.12 or 1.13? Criterion 3 is met; waiting for the user's decision.

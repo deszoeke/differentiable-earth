@@ -35,3 +35,4 @@ If we go Reactant-only, 1.12.x is the conservative choice. 1.13.4 or later is pl
 | Date | Check | Result |
 |---|---|---|
 | 2026-11-15 | Initial pin | 1.11.9. #1051 open; NumericalEarth Reactant CI on 1.11.9; Reactant 0.2.308 and Enzyme 0.13.219 allow Julia ≥ 1.10. |
+| 2026-11-16 | Plain-Enzyme cross-check on SpeedyWeather | **Fails on 1.11:** plain Enzyme on PrimitiveWet (T32L8) segfaulted in GC after 26 min (`set_runtime_activity(Reverse)`, as SpeedyWeather's `full_diff_CI.jl` notes). Replaced by finite differences, which are version-independent. Reactant gradients now pass FD checks for the atmosphere (PrimitiveWet T32L8 Float64, 6 steps: 3e-8 at ε = 1e-5) and the ocean (HydrostaticFreeSurfaceModel, LatitudeLongitudeGrid: 1e-12 at ε = 1e-3). **Criterion 3 is met.** |
