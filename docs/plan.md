@@ -294,3 +294,18 @@ differentiable-earth/
   
   Each result links to the NetCDF file and script that produced it.
 - `README.md`: a short overview, with pointers to the files above.
+
+## Design revision (2026-11-16): where AD is used
+**Evidence.** The toy experiments are in `docs/tutorial_enzyme_reactant.md` §6 and `docs/technical.md` §4.1.
+- The tangent-linear model has no saturation, so beyond the atmospheric predictability limit the single-trajectory derivative grows like e^(λT); in the toy, λ corresponds to a doubling time of about 2 days.
+- Ocean perturbations reach the atmosphere through the coupling within days, and come back amplified. So even the sensitivities of ocean metrics such as Tₑ to the initial ocean state are dominated by chaotic paths.
+- AD gives the *expected derivative*, but the target is the *derivative of the expected forecast*. In chaotic systems these differ, and averaging the derivative over an ensemble does not converge. The "ensemble-averaged adjoint at long leads" idea in this plan is **dropped**.
+
+**Revised roles:**
+1. **Coupled tangent-linear and adjoint models over short windows** (up to about 1–2 weeks, the TLM-valid window): exact sensitivities, short-range B-weighted singular vectors, 4D-Var-style analysis, and targeting for weather and subseasonal targets (ARs, MJO-event onset, PNA/NAM regimes).
+2. **Ocean-only adjoint (Oceananigans) under prescribed atmospheric forcing:** climatological plus stochastic, or a statistical atmosphere, with no dynamic atmosphere. A coarse-resolution ocean isn't chaotic, so the derivatives stay valid for months to years. This gives the sensitivity of ENSO/PDO metrics to the initial ocean state, validated against coupled ensembles.
+3. **Long-lead coupled response from statistics:** the fluctuation–dissipation response operator R(τ) ≈ C(τ) C(0)⁻¹, built from the strongly coupled lagged covariance (aim 1), with the LIM as one form. Long-lead targeting through ensemble-transform signal variance or ΔVar computed with R(τ) in place of the TLM.
+4. **Hybrid / chaining:** a short-window adjoint, then a covariance-based response.
+5. **Reserve:** least-squares shadowing (LSS/NILSS) for exact derivatives of long-time statistics, if ever needed.
+
+**Unchanged:** the coupled model must still be differentiable, for roles 1 and 2 and for later calibration and hybrid machine learning. So phase 4 still goes ahead: precomputed regridding weights and Reactant ports of the atmosphere, the ocean and the coupler.
