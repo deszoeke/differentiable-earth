@@ -63,7 +63,17 @@ Searched with Consensus. Preprints are marked; they are not peer reviewed. These
   - Wright et al. (2024, QJ);
   - Purcell et al. (2026, QJ).
 - Bach et al. (2019, J. Climate) map local ocean↔atmosphere predictability with Granger causality, from observations.
-- **I found no study** of how the coupled covariance's structure and predictable modes evolve at monthly-to-interannual leads in GCM ensembles. That needs a more targeted search (O'Kane et al.; Penny et al. on coupled predictability).
+- *Targeted follow-up (2026-11-16), which found partial overlap at seasonal-to-interannual leads:*
+  - **O'Kane et al. (2018, J. Climate):** strongly coupled ensemble assimilation and multiyear ENSO prediction. Cross-domain covariances; bred vectors that project onto thermocline disturbances; bred-vector error growth that leads ENSO SST by about 6 months. The closest prior work.
+  - **Lu, Liu, Zhang et al. (2015, MWR), "Leading averaged coupled covariance" (LACC):** uses *lagged*, time-averaged ocean–atmosphere covariances for strongly coupled data assimilation in a coupled GCM. Directly relevant to a covariance that depends on lead.
+  - **Coupled growing modes for ENSO ensembles:** Yang et al. (2008, J. Climate), coupled bred vectors; Duan, Hu & Feng (2024, Sci. China Earth Sci.), coupled conditional nonlinear optimal perturbations (C-CNOP).
+  - **Low-order coupled models:**
+    - Tondeur et al. (2020, J. Stat. Phys.): time-scale separation, Lyapunov spectra and EnKF behaviour in the MAOOAM coupled model;
+    - Demaeyer, Penny & Vannitsem (2022, JAMES): initializing ensembles from Koopman and Perron–Frobenius eigenfunctions (estimated by DMD) and adjoint covariant Lyapunov vectors. Related to our least-damped modes.
+  - **A GCM ensemble against a reduced-model benchmark:** Mao et al. (2026, arXiv preprint), CESM2 SMYLE 20-member hindcasts to 24 months, scored against the extended nonlinear recharge oscillator (XRO) with ensemble sensitivity analysis. They find *state-dependent under-dispersion* of the GCM itself. Close in spirit to our "linear baseline vs physics ensemble" level, but using real-world hindcasts, not a perfect model.
+  - **ML coupled model:** Ola (Wang et al. 2024, arXiv preprint), an ML ocean–atmosphere model with an internal ENSO.
+- **Still open:** in a *perfect-model* setting, how the **full** coupled covariance's structure evolves with lead, and how its predictable modes, optimal growth, predictable components and APT relate to each other, used as ground truth for emulators. The novelty is narrower than first stated.
+- **Tools:** Elicit cannot be used through the connector, because the user's Elicit plan has no API access (needs Pro). The checks so far use Consensus only.
 
 **4. Where coupled AD helps: theory known; the forecast-lead quantification in a modern differentiable coupled GCM is new-ish.**
 - Lea, Allen & Haine (2000, Tellus) and Lea et al. (2002, QJ):
@@ -93,3 +103,44 @@ The strongest remaining niche combines items 1 and 3:
 - used to benchmark linear (LIM/FDT) and ML (stochastic, FDT-constrained) emulators **on predictability diagnostics,** including the coupled cross-covariances.
 
 This extends Mahajan et al. (2026), which covers 10-day spread and covariance, and Falasca & Zanna (2026), which covers stationary statistics and forced response, to *forecast* predictability in a coupled system. Items 2, 4 and 5 are supporting contributions.
+
+### Full-text reading of the three closest papers (2026-11-16, by a subagent)
+**Mahajan, Kelleher & Fan (2026, PASC).** Read from the OSTI author manuscript, a working draft dated 2025-12-13 that may differ from the published version.
+- **Setup:**
+  - E3SMv3 ultra-low resolution (ne4pg2, about 7–8°). It doesn't say whether the ocean is active or SST is prescribed.
+  - The emulator holds only **20 atmospheric variables**.
+  - A 1000-member perfect-model ensemble, **one start date, leads up to 10 days**.
+- **Emulator:** a **deterministic** FourCastNet (AFNO), turned into an ensemble only by starting it from the E3SM members (no noise).
+- **Results:**
+  - spread at day 10 is 25–45% of E3SM's;
+  - spread grows by a factor of 3–8 from day 1 to day 10 in E3SM, but only 0.9–2 in the emulator;
+  - permutation tests reject equality of the 20×20 error covariance and correlation matrices;
+  - upper tails are under-populated.
+- **Future work they list:** stochastic or latent-variable emulators, diffusion ensembles, noise injection.
+- **No predictability diagnostics** (signal-to-noise, PCA, APT, optimal growth), and no leads beyond 10 days.
+
+**Falasca & Zanna (2026, arXiv:2602.13847 v5).**
+- **Noise:** Σ is diagonal from residual standard deviations (idealized cases), or the **full residual-covariance Cholesky factor** (ENSO case), with optional multilevel non-Markovian layers. The Lyapunov/FDT relation is **not** used to constrain Q; FDT is used for response validation and causal masking.
+- **Evaluation:** PDFs, autocorrelation, spectra and forced responses only. **No forecast skill, spread or predictability by lead.**
+- **ENSO state space:** ORAS5 SST and SSH, 10 EOFs each (n = 20). Ocean only, with no atmosphere; the authors list the missing fast atmosphere as a limitation.
+- **Future work they list:** using FDT response operators as calibration targets for pretrained emulators. That is close to our item 2, so cite it and distinguish ours early.
+
+**Köhl et al. (2026, QJRMS), CESAM.**
+- **Model:** MITgcm at 4° coupled to PlaSim at T21.
+- **The nudging:** it nudges the atmosphere to hourly ERA5 in **both the forward and the adjoint model**, with time scales of 0.25–2 days. That makes the tangent-linear model stable, so a 39-year adjoint is possible.
+- **Controls:** atmospheric parameters, initial ocean T/S, daily flux corrections, and GM/Redi diffusivities.
+- **Not done:** no forecast initial-condition sensitivity and no targeting.
+- **Their stated limits:**
+  - the atmospheric adjoint memory is "effectively only a few days";
+  - nudging breaks conservation;
+  - the product is "best characterized as an ocean synthesis";
+  - nudging can't be applied in forecasts, since there are no future data to nudge toward.
+- **Implication (inferred):** this does not supersede our ocean-only adjoint (role 2). In effect it *is* an ocean adjoint with a damped atmosphere. Untested middle ground: nudge the atmosphere toward the ensemble mean or climatology to approximate a stochastically forced ocean adjoint.
+
+**Newly flagged competitor (reported by the subagent; not yet checked):** Wu et al. (2026, arXiv:2608.10277), a *coupled stochastic* emulator, ACE2S plus Samudra, of E3SMv3. It is evaluated on the ENSO spectrum and variability rather than on predictability. Read it in full next.
+
+### Updated assessment
+- **(a) A perfect-model coupled predictability benchmark at S2S-to-interannual leads, using predictability diagnostics: still open.** Mahajan et al. supply the motivating result (deterministic emulators under-disperse) but stay atmosphere-only, deterministic, and within 10 days.
+- **(b) An FDT/Lyapunov-constrained noise covariance for emulators: not done in Falasca & Zanna,** who fit Σ from residuals. But they name "FDT response as a calibration target" as future work, so this needs to be distinguished quickly.
+- **(c) A nudged coupled adjoint is not a better route for forecast targeting.** It reduces to an ocean adjoint with a damped atmosphere, which supports role 2. Nudging toward the ensemble mean is a possible variant to test.
+- **Next:** read Wu et al. 2026 (ACE2S plus Samudra) in full; it may be the closest coupled-emulator competitor.
