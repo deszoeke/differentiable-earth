@@ -36,11 +36,16 @@ _Last updated 2026-11-15._
   - the LIM keeps skill: Tₑ pattern correlation 0.64 at 1 year;
   - but the truth is noise-dominated beyond about 2 months, so the run needs a redesign.
 
+- Phase 2 (`phase2-coupled-model`):
+  - coupled smoke test passes (`run/coupled-smoke/`);
+  - regridding weights extracted, checked (transpose 4e-15, constant-preserving, identical to `ConservativeRegridding.regrid!`) and saved (`run/regrid-weights/`), through the `DifferentiableEarthCoupledExt` extension.
+- Reactant atmosphere and ocean checks are written but need CUDA.jl (deferred).
+- **Plan re-scoped** (`docs/plan.md`, "Re-scoped aims and phases"): ensembles plus the strongly coupled covariance (least-damped modes, PCA/APT, response operators), ML emulation with rigorous predictability, AD in supporting roles.
+
 ## Next
-1. The user reviews the comparison notebook.
-2. A resolvable truth (§4.2): sensitivities along a few directions with about 2000 members, plus a hybrid estimator (short adjoint, then LIM).
-3. Build graphify graphs of the upstream package sources (`helpers/graph_package.sh`).
-4. Coupled smoke test: update `test_NumericalEarth.jl` to `EarthSystemModel`.
+1. A multi-decade low-resolution coupled nature run, plus a timing study (with `caffeinate`).
+2. Realism checks for the Tier 1 phenomena in the nature run.
+3. Large ensembles, then the covariance and predictable modes.
 
 ## Open questions
-- None right now.
+- Add CUDA.jl to the root environment for the Reactant checks: deferred by the user.

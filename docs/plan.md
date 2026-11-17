@@ -313,3 +313,53 @@ differentiable-earth/
    - Caveat: x̄ is not a model solution, and the damping is a modelling choice.
 
 **Unchanged:** the coupled model must still be differentiable, for roles 1 and 2 and for later calibration and hybrid machine learning. So phase 4 still goes ahead: precomputed regridding weights and Reactant ports of the atmosphere, the ocean and the coupler.
+
+## Re-scoped aims and phases (2026-11-16)
+This section supersedes the earlier phase list wherever they differ.
+
+**Why.** The toy experiments and the AD design revision showed two things:
+- Trajectory derivatives are valid only inside the predictability window, about 1–2 weeks for the atmosphere.
+- Predictability at monthly to interannual leads lives in the **expectation** and **covariance** of the coupled system: predictability of the second kind.
+
+So the project centres on **large ensembles of a low-resolution strongly coupled model and its coupled covariance**. It is organized as a **hierarchy of methods**, each scored against the one above on the same predictability metrics. In this perfect-model setting the true predictability is known from the ensembles, so every cheaper method's skill and spread can be checked.
+
+**The hierarchy:**
+1. **Physics ensembles:** large ensembles of the coupled model, NumericalEarth with SpeedyWeather and Oceananigans. These are the truth.
+2. **The strongly coupled covariance:** lagged covariances with the full ocean–atmosphere cross terms. From them:
+   - **POP/LIM eigenmodes** of G(τ) = C(τ) C(0)⁻¹. The **least-damped modes** are the candidate predictable patterns (ENSO, PDO, …), with their coupled atmospheric parts.
+   - **Predictable component analysis** (Schneider & Griffies), a generalized eigenproblem between Σ(T), the forecast-ensemble covariance, and C, the climatological covariance. It uses the nonlinear ensemble directly.
+   - **Average predictability time** (DelSole & Tippett): predictability integrated over lead.
+   - **Response operators** by the fluctuation–dissipation relation, R(τ) ≈ C(τ) C(0)⁻¹.
+   - **Comparisons:** does the least-damped POP equal the leading predictable component, and at which leads do they diverge?
+3. **Linear baselines:** LIM, POP and PCA forecasts, and the predictability each implies.
+4. **ML emulation with rigorous predictability.** Emulators trained deterministically (MSE) learn the conditional mean. They relax toward climatology and **under-predict error and spread**, the mirror image of the TLM's unbounded growth. Remedies:
+   - **Probabilistic training:** proper scores (CRPS, energy score) on the physics ensembles.
+   - **Split the state:**
+     - an ML (nonlinear) drift on the slow, predictable subspace (the least-damped modes);
+     - a stochastic residual whose covariance obeys the fluctuation–dissipation constraint Q = −(L C₀ + C₀ Lᵀ), so the emulator's climatological variance is correct by construction and its spread cannot collapse.
+   - **Generative emulators,** such as score-based diffusion conditioned on the initial slow state, to produce ensembles directly.
+   - **Verification against the physics ensembles:** spread–skill ratio, rank histograms, and spectra of the predictable components, the APT and the least-damped modes, all by lead and season.
+5. **Targeted observations:** ΔVar from ensemble or covariance statistics (ETKF signal variance, or R(τ) in place of the TLM), validated with OSSEs. The **ocean-only adjoint** supplies interannual ocean-initial sensitivity at full ocean dimension, for siting Argo or TPOS-style observations.
+
+**AD's supporting roles** (see the design revision above):
+- the ocean-only adjoint under prescribed or stochastic atmospheric forcing;
+- a short-window coupled TLM and adjoint for subseasonal targets, extending a little into weeks 2–4;
+- basic-state Jacobians for linear and stochastic atmospheres;
+- **end-to-end training** of ML or stochastic components over short windows, with losses on ensemble spread as well as the mean.
+
+Reactant is kept mainly for **GPU performance portability of the large ensembles**.
+
+**Revised phases:**
+1. **Toy model:** done (`phase1-toy-model`). AD validated; the chaos limit and the failure of ensemble-mean adjoints shown; LIM and regression baselines.
+2. **Coupled model, forward:**
+   - smoke test: done;
+   - regridding weights: done, saved to NetCDF, adjoint = transpose;
+   - next: a multi-decade nature run at low resolution, the realism check for each phenomenon tier, and a timing study (CPU, and later GPU through Reactant).
+3. **Large ensembles:** initialized from the nature run (perturbed atmosphere, perturbed ocean, or both), at several start seasons and leads up to 2 years. They supply forecast covariances Σ(T) and the climatological C.
+4. **Strongly coupled covariance and predictable modes:** POP/LIM, PCA, APT and response operators, by phenomenon (registry) and season.
+5. **Targeting and OSSEs** from ensemble or covariance statistics, plus the ocean-only adjoint for ocean observations.
+6. **ML emulation** of the slow subspace with calibrated stochastic residuals, verified against phases 3–4.
+7. **AD extras as needed:**
+   - Reactant ports and checks of the atmosphere and ocean. `drivers/reactant_*_check.jl` is written; it needs CUDA.jl, deferred, because Reactant compiles KernelAbstractions kernels through its CUDA extension even on CPU.
+   - Short-window coupled adjoint.
+   - End-to-end training.
