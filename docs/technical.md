@@ -32,6 +32,11 @@ One symbol per quantity; time dependence is always an argument in parentheses (n
 | C(τ) | nature-run lag covariance ⟨x(t+τ) x(t)ᵀ⟩ over t (the model's own climate, not observations); C(0) is the nature-run covariance. Seasonal version: C(τ; month), averaged only over t in that calendar month |
 | Σ(τ; t) | forecast (ensemble) covariance at lead τ for the ensemble started at t: ⟨(x_k(t+τ) − x̄(t+τ)) (x_k(t+τ) − x̄(t+τ))ᵀ⟩ over k. Σ(0; t) is the initial-uncertainty (analysis-error) covariance. The start argument t is dropped when it is clear |
 | Σ(τ, 0) | ensemble cross-covariance between member deviations at lead τ and at the start |
+
+**Same-time and lagged.** Σ(τ) is a *same-time* covariance: both factors are member deviations at lead τ, so it is symmetric and measures the forecast spread. C(τ) is *lagged*, x(t+τ) against x(t), and not symmetric for τ ≠ 0. The lagged ensemble quantity is Σ(τ, 0). Predictable component analysis compares two same-time covariances, Σ(τ) and C(0).
+
+| Symbol | Meaning |
+|---|---|
 | S(τ) | signal covariance: covariance over starts t of the ensemble means x̄(t+τ). C(0) = ⟨Σ(τ; t)⟩ over t + S(τ) |
 | M(τ) | the forecast map: the nonlinear model run for lead τ |
 | M′(τ) | tangent-linear propagator (Jacobian of M along a trajectory); M′(τ)ᵀ is the adjoint |
@@ -201,3 +206,45 @@ Estimate the expected-forecast sensitivity along a few **directions** instead of
 - **Members:** about 2000.
 
 Score the estimators by projecting them onto the same directions. Optionally add a hybrid estimator: an adjoint over the short TLM-valid window (about a week), then the LIM beyond it.
+
+## 5. Filtering fast, unpredictable modes (2026-11-17)
+Beyond the atmospheric predictability limit, forecasts are only useful through their slow, predictable part. Initialized ensembles isolate it by averaging over members. The methods below do it **without ensembles**, from a single long run or a single realization, or **use ensembles once** to build filters that are then applied everywhere. Methods 1–4 and 6 are the ones to use first: they are cheap and work directly on archived institutional data (control runs, monthly means).
+
+1. **Time averaging.** Fit and forecast on monthly or seasonal means, the standard LIM practice (Penland & Sardeshmukh 1995). Averaging over longer than the atmospheric decorrelation time (days to weeks) leaves mainly the slow, ocean-forced part. The averaging window must be shorter than half the period of the slowest oscillation of interest, and fitting lags ℓ are chosen accordingly (τ-test).
+2. **Subspace projection.** Restrict to slow variables, or truncate to leading EOFs of SST and upper-ocean heat content.
+   - In the toy model, a LIM fitted to the full state (with the chaotic Lorenz-96 atmosphere) failed: it gave negative "variances" and failed the τ-test.
+   - On the 38 slow variables it passed the τ-test, and its leading predictable patterns matched the ensemble's with |correlation| 0.96–1.00 (`drivers/toy_predictable_components.jl`).
+3. **Projection onto least-damped modes.** Keep only the POP/LIM eigenmodes of L with long decay times, i.e. eigenvalues with real part closest to zero. Fast modes are, by construction, the strongly damped ones.
+   - Caveat: G is non-normal, so damped modes can interfere constructively. Keep the optimal-growth structures (singular vectors of G(τ)) alongside the least-damped modes.
+4. **Predictable-component filters.** The filters q from Σ(τ) q = γ C(0) q (Schneider & Griffies 1999) are linear projections that extract the predictable part of *any* single state: the component amplitude is qᵀx.
+   - Estimate them once from initialized ensembles; then apply them to the nature run, to single forecasts or to observations. This is the main remaining job of the initialized ensembles.
+   - Only components with γ clearly below the sampling-noise floor, about (1 − √(d/ν))² for dimension d and ν degrees of freedom (Marchenko–Pastur), are real. In the toy at 2 years only one component (the ENSO pair's leading phase) passes.
+   - Related: signal-to-noise-maximizing patterns and optimal fingerprints (e.g. Venzke et al. 1999).
+5. *(Secondary.)* Wiener-type optimal filtering of the slow signal.
+6. **Conditional-mean estimation from one long run.** Learn the expected forecast E[x(t+τ) | x(t)] by regression on a single long run, with no ensembles:
+   - **linear:** the LIM propagator G(τ) = C(τ) C(0)⁻¹;
+   - **nonlinear:** analog or kernel-analog forecasting (e.g. Zhao & Giannakis), or a neural network trained with mean-squared error.
+   - **Link to the emulators:** an ML emulator trained deterministically (MSE) *is* a conditional-mean estimator. Its under-dispersion, a flaw for ensemble forecasting, makes it a built-in filter of chaos that gives the expected forecast. The same emulator serves two roles: the conditional mean (deterministic), and the full forecast distribution once calibrated noise is added (phase 6).
+   - Check against initialized ensembles: the conditional mean should match the ensemble mean x̄(t+τ) at every lead.
+
+Other options, for later:
+7. Spectral splitting of the dynamics: covariant Lyapunov vectors (unstable, neutral, stable), or Koopman and Perron–Frobenius eigenfunctions from DMD (Demaeyer, Penny & Vannitsem 2022).
+8. Stochastic mode reduction (Majda–Timofeyev–Vanden-Eijnden): eliminate the fast modes analytically, replacing them with noise plus deterministic corrections.
+9. Slow-manifold projection, the coupled analogue of normal-mode or digital-filter initialization in NWP.
+10. Nudging or synchronizing the atmosphere toward a reference (Köhl et al. 2026). Useful for estimation and adjoints, not for forecasts.
+
+### 5.1 The hybrid model: a linear stochastic atmosphere plus slow ocean dynamics
+Split the state into slow variables s (ocean) and fast variables f (atmosphere):
+- fast: df/dt = A_ff f + A_fs s + ξ, a damped linear atmosphere forced by the ocean, plus noise ξ;
+- slow: ds/dt = L_ss s + L_sf f.
+
+The atmosphere block can come from three sources:
+- dynamically, from the tendency Jacobian A at the mean state with eddy damping (the one place derivatives fit);
+- empirically, from a LIM fitted to (s, f) at short fitting lags;
+- from ensemble propagators over days.
+
+Because the atmosphere adjusts quickly, f ≈ −A_ff⁻¹ A_fs s + noise. Substituting gives a LIM for the ocean alone:
+- **effective dynamics:** L_eff = L_ss − L_sf A_ff⁻¹ A_fs, the coupled feedback (Bjerknes-like) inside the ocean operator;
+- **effective noise:** the atmosphere's stochastic forcing, filtered through L_sf.
+
+This is Hasselmann's stochastic climate model, made formal (Mori–Zwanzig, or method 8). It is mainly for **interpretation**: it separates the predictability created by coupled feedback (in L_eff) from the noise that limits it, and identifies which atmospheric patterns matter.
