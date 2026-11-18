@@ -1,9 +1,9 @@
 ---
 name: julia-env
-description: How to run, test, precompile and inspect Julia in the differentiable-earth project (Julia 1.11 pin, project environments, time limits, package versions). Use before running any julia command here, or when packages fail to load or recompile.
+description: How to run, test, precompile and inspect Julia in the predictable-ocean project (Julia 1.11 pin, project environments, time limits, package versions). Use before running any julia command here, or when packages fail to load or recompile.
 ---
 
-# Julia in differentiable-earth
+# Julia in predictable-ocean
 
 ## Versions
 - **Julia 1.11.9 is pinned.** A juliaup override applies in this repo, so `julia` starts 1.11 here. In scripts and jobs, write `julia +1.11` explicitly. Rationale and unpin criteria: `docs/julia_pin.md`. Never change the pin casually.

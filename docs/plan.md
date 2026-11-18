@@ -163,7 +163,7 @@ Reuse the patterns from `~/projects/monsoon-breeze` (heavy code in a precompiled
 
 ### Layout
 ```
-differentiable-earth/
+predictable-ocean/
   CLAUDE.md                project rules and who-reads-code; points to notes/STATUS.md and plots/CLAUDE.md
   Project.toml             driver environment: PredictableOcean (path source), Reactant, Enzyme, …
   PredictableOcean/     package: Project.toml with compat bounds, src/, test/; PrecompileTools workload
@@ -182,8 +182,8 @@ differentiable-earth/
 ```
 
 ### Repository
-- Repo `github.com/deszoeke/differentiable-earth`, cloned to `~/projects/differentiable-earth`. It has one commit (LICENSE); `test_NumericalEarth.jl` is untracked.
-- HPC path: `/ceoas/deszoeks/projects/differentiable-earth`.
+- Repo `github.com/deszoeke/differentiable-earth`, cloned to `~/projects/differentiable-earth`. It has one commit (LICENSE); `test_NumericalEarth.jl` is untracked. Renamed to `predictable-ocean` (repo and clones) on 2026-11-18, after the package became `PredictableOcean`.
+- HPC path: `/ceoas/deszoeks/projects/predictable-ocean`.
 
 ### Julia 1.11 pin (decided). Write up in `docs/julia_pin.md`
 - **Mechanism:** `juliaup override set 1.11` in the repo (Mac), `julia +1.11` in every job script, and `julia = "~1.11"` in `[compat]` for the package and the driver environment. **Commit `Manifest.toml`** for the main environment, so the laptop and the HPC run the same Reactant/Enzyme versions. `plots/` stays unpinned, with an untracked Manifest, and gets its own Jupyter kernel.

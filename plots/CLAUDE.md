@@ -1,6 +1,6 @@
 # plots/
 
-All plotting for differentiable-earth. The root `CLAUDE.md` covers the project's rules; this file covers how plots are made.
+All plotting for predictable-ocean. The root `CLAUDE.md` covers the project's rules; this file covers how plots are made.
 
 ## Environment
 - `plots/Project.toml`: CairoMakie, FFTW, NCDatasets, Revise, IJulia, Statistics, and Pluto, PlutoUI, PlutoLinks. It has no model packages, so it loads fast and runs on the Mac or the HPC.

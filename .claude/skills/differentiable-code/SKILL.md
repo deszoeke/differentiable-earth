@@ -1,6 +1,6 @@
 ---
 name: differentiable-code
-description: Checklist and test templates for writing and verifying differentiable code with Reactant.jl and Enzyme.jl in differentiable-earth (traced code rules, activity annotations, checkpointing, adjoint dot-product test, finite-difference test, Reactant-vs-Enzyme comparison). Use before writing or reviewing any code that will be compiled with Reactant or differentiated with Enzyme.
+description: Checklist and test templates for writing and verifying differentiable code with Reactant.jl and Enzyme.jl in predictable-ocean (traced code rules, activity annotations, checkpointing, adjoint dot-product test, finite-difference test, Reactant-vs-Enzyme comparison). Use before writing or reviewing any code that will be compiled with Reactant or differentiated with Enzyme.
 ---
 
 # Differentiable code: rules and tests

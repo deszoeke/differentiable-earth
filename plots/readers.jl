@@ -1,4 +1,4 @@
-# Readers for differentiable-earth NetCDF output, plus small array helpers. Readers return plain
+# Readers for predictable-ocean NetCDF output, plus small array helpers. Readers return plain
 # arrays with their coordinates and attributes; computations stay visible in the notebook.
 # No plotting library here (plotlib.jl does the plotting).
 

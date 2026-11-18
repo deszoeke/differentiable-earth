@@ -1,4 +1,4 @@
-# User-configurable plotting functions for differentiable-earth (CairoMakie). Each function takes
+# User-configurable plotting functions for predictable-ocean (CairoMakie). Each function takes
 # plain arrays, has keyword defaults, and returns its handles (fig, ax, plot objects, colorbar) so a
 # notebook cell can restyle the figure afterwards (ax.title = ..., hm.colorrange = ..., xlims!(ax, ...)).
 # Conventions: plots/CLAUDE.md. Data readers: readers.jl.

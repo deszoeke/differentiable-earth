@@ -1,4 +1,4 @@
-# differentiable-earth
+# predictable-ocean
 
 A perfect-model study of coupled ocean–atmosphere predictability, from months to years, using a differentiable NumericalEarth + SpeedyWeather + Oceananigans model, differentiated with Reactant and Enzyme. Two aims:
 - build the strongly coupled covariance matrix and find modes of variability from it;
@@ -12,7 +12,7 @@ A perfect-model study of coupled ocean–atmosphere predictability, from months 
 - **Julia 1.11 is pinned:** a juliaup override on the Mac, and `julia +1.11` in job scripts. Why, and when to lift it: `docs/julia_pin.md`. Don't change the pin without checking the criteria there.
 - `Manifest.toml` is committed for the main environment, so the laptop and the HPC run identical Reactant/Enzyme versions. `plots/` has its own environment, unpinned, and its Manifest is not committed.
 - **Commands:** run `julia --project=.` in the repo. Run tests with `julia --project=PredictableOcean -e 'using Pkg; Pkg.test()'`. More in the `julia-env` skill.
-- **HPC path:** `/ceoas/deszoeks/projects/differentiable-earth`. Slurm only; never compile on the head node.
+- **HPC path:** `/ceoas/deszoeks/projects/predictable-ocean`. Slurm only; never compile on the head node.
 
 ## Rules
 - **Never run `ssh`, `scp`, `sftp` or remote `rsync` unless the user explicitly asks.** This holds in auto mode too.

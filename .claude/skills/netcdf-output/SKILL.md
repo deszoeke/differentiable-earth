@@ -1,6 +1,6 @@
 ---
 name: netcdf-output
-description: NetCDF file conventions for differentiable-earth (file naming, CF metadata, provenance attributes, stored regridding weights, results files). Use when writing or reading any project output file, or adding a new output type.
+description: NetCDF file conventions for predictable-ocean (file naming, CF metadata, provenance attributes, stored regridding weights, results files). Use when writing or reading any project output file, or adding a new output type.
 ---
 
 # NetCDF output conventions
