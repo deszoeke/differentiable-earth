@@ -27,7 +27,7 @@ outfile      = "toy_predictable_components.nc"
 ##### Setup
 #####
 
-using DifferentiableEarth
+using PredictableOcean
 using LinearAlgebra, Random, Statistics, NCDatasets
 
 m = ToyCoupled()

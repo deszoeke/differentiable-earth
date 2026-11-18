@@ -5,7 +5,7 @@ description: NetCDF file conventions for differentiable-earth (file naming, CF m
 
 # NetCDF output conventions
 
-All output is NetCDF, written through `DifferentiableEarth/src/io.jl` (NCDatasets). JLD2 is not used. `plots/readers.jl` reads these conventions.
+All output is NetCDF, written through `PredictableOcean/src/io.jl` (NCDatasets). JLD2 is not used. `plots/readers.jl` reads these conventions.
 
 ## Files
 - **Location:** run output goes in `run/<name>/`; shared assets (regridding weights, phenomenon patterns) go in `assets/`. Neither is committed.
@@ -16,7 +16,7 @@ Written automatically by `io.jl` (`write_provenance!`):
 - `git_commit`, `git_dirty` (true or false), `git_branch`;
 - `settings`, the driver's `##### Settings` block as text;
 - `driver`, the path of the driver copy that produced the file;
-- `julia_version` and `packages`: name=version for Reactant, Enzyme, Oceananigans, SpeedyWeather, NumericalEarth, ConservativeRegridding and DifferentiableEarth;
+- `julia_version` and `packages`: name=version for Reactant, Enzyme, Oceananigans, SpeedyWeather, NumericalEarth, ConservativeRegridding and PredictableOcean;
 - `host`, `arch` and `created` (ISO date);
 - `Conventions = "CF-1.10"`, `title`, `history`.
 

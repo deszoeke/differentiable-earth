@@ -24,7 +24,7 @@ outfile      = "tutorial_ad.nc"
 ##### Setup
 #####
 
-using DifferentiableEarth
+using PredictableOcean
 using Enzyme, LinearAlgebra, Random, Statistics, NCDatasets
 use_reactant && using Reactant
 

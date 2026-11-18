@@ -24,7 +24,7 @@ param_overrides = (;)
 ##### Setup
 #####
 
-using DifferentiableEarth
+using PredictableOcean
 using Random
 
 params = ToyParams(; param_overrides...)

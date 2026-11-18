@@ -27,7 +27,7 @@ outfile      = "toy_sensitivity_comparison.nc"
 ##### Setup
 #####
 
-using DifferentiableEarth
+using PredictableOcean
 using LinearAlgebra, Random, Statistics, NCDatasets
 
 @info "threads" Threads.nthreads()

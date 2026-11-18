@@ -48,7 +48,7 @@ Each AD estimate is cross-checked against its ensemble counterpart. Where they d
 - `julia --project=. -e 'using Pkg; Pkg.add([...])'` to create `Project.toml` and `Manifest.toml` with: NumericalEarth (0.9.3), Oceananigans (0.117.x), SpeedyWeather (0.24), ConservativeRegridding (0.2), Reactant, Enzyme, KrylovKit, LinearAlgebra, SparseArrays, Statistics, NCDatasets, PythonPlot, IJulia. Set `[compat]` bounds to the resolved versions.
 - Update `test_NumericalEarth.jl` to use `EarthSystemModel`, and run a 5-day coupled smoke test on CPU.
 
-### 1. Package skeleton: `DifferentiableEarth` (src/ + experiments/ + test/ + docs/)
+### 1. Package skeleton: `PredictableOcean` (src/ + experiments/ + test/ + docs/)
 - `src/model.jl`: `build_coupled_model(; resolution=:coarse, arch, physics=:default)`. Wraps `atmosphere_simulation` and `ocean_simulation` from NumericalEarth.
   - Coarse default: T31L8 Speedy, coupled to a 20-level Oceananigans ocean.
   - The ocean uses `ExplicitFreeSurface` (or split-explicit for forward-only runs) and a cheap closure, not CATKE, for AD.
@@ -165,8 +165,8 @@ Reuse the patterns from `~/projects/monsoon-breeze` (heavy code in a precompiled
 ```
 differentiable-earth/
   CLAUDE.md                project rules and who-reads-code; points to notes/STATUS.md and plots/CLAUDE.md
-  Project.toml             driver environment: DifferentiableEarth (path source), Reactant, Enzyme, …
-  DifferentiableEarth/     package: Project.toml with compat bounds, src/, test/; PrecompileTools workload
+  Project.toml             driver environment: PredictableOcean (path source), Reactant, Enzyme, …
+  PredictableOcean/     package: Project.toml with compat bounds, src/, test/; PrecompileTools workload
     src/toy/               ToyCoupled (Lorenz-96 + slab/recharge ocean), implements AbstractPropagator
     src/coupled/           model.jl, state.jl, regridding.jl, reactant_coupling.jl, physics options
     src/phenomena/         Phenomenon registry

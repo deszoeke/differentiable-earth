@@ -56,7 +56,7 @@ end
 Oscillation statistics of series `x` sampled every `dt`: after a `smooth`-sample centered running
 mean, cycles are intervals between upward crossings of the mean. Returns
 `(; lengths, mean, std, cv)`, `cv = std/mean` (irregularity). Same as
-`DifferentiableEarth.cycle_stats` (copied so plots/ needs no model packages).
+`PredictableOcean.cycle_stats` (copied so plots/ needs no model packages).
 """
 function cycle_stats(x::AbstractVector, dt::Real; smooth::Integer = 5)
     h = smooth ÷ 2

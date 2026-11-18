@@ -56,7 +56,7 @@ One symbol per quantity; time dependence is always an argument in parentheses (n
 Toy-model parameters (F, α, β, λ for slab damping, R, γ, σ, ϵ, r, a, μ, …) are named in §2 only and are not project notation.
 
 ## 1. The propagator interface
-Every analysis is written against `AbstractPropagator` (`DifferentiableEarth/src/propagator.jl`). A propagator has:
+Every analysis is written against `AbstractPropagator` (`PredictableOcean/src/propagator.jl`). A propagator has:
 - a flat state vector `x`;
 - `advance(m, x)`, which takes one time step and returns a new vector without mutating `x`;
 - `propagate(m, x, n)`, which takes n steps: the forecast map M(τ) for lead τ = n Δt;
@@ -65,7 +65,7 @@ Every analysis is written against `AbstractPropagator` (`DifferentiableEarth/src
 The toy model and, later, the coupled NumericalEarth model both implement this interface. Covariances, singular vectors, targeting and OSSEs therefore run unchanged on either.
 
 ## 2. The toy model: `ToyCoupled`
-`DifferentiableEarth/src/toy/toy_coupled.jl`. A Lorenz-96 "atmosphere" of K = 36 sectors, coupled to a slab ocean under each sector and to a recharge-oscillator ENSO. It is meant to have the same three time scales as the real problem:
+`PredictableOcean/src/toy/toy_coupled.jl`. A Lorenz-96 "atmosphere" of K = 36 sectors, coupled to a slab ocean under each sector and to a recharge-oscillator ENSO. It is meant to have the same three time scales as the real problem:
 
 | Component | Variables | Time scale | Role |
 |---|---|---|---|
@@ -108,7 +108,7 @@ Why a toy model first:
 - The analysis code (covariances C and Σ, singular vectors, targeting ΔVar, ETKF/OSSE) can be checked against exact answers in seconds.
 - The Enzyme/Reactant workflow can be learned on a model small enough that its full Jacobian fits in memory (74 × 74), so every AD result can be checked against a brute-force one.
 
-Status: implemented and tested (`DifferentiableEarth/test/test_toy.jl`). The tests cover the Lorenz-96 limit, purity, boundedness and sensitive dependence on initial conditions. **ENSO tuning (2026-11-15).** The first guess was a self-sustained oscillation: R = +0.002, γ = 0.02, σ = 0.01. Its period was ≈ 3.8 years, but it was too regular: the CV of cycle lengths was ≈ 0.1 over 300 years.
+Status: implemented and tested (`PredictableOcean/test/test_toy.jl`). The tests cover the Lorenz-96 limit, purity, boundedness and sensitive dependence on initial conditions. **ENSO tuning (2026-11-15).** The first guess was a self-sustained oscillation: R = +0.002, γ = 0.02, σ = 0.01. Its period was ≈ 3.8 years, but it was too regular: the CV of cycle lengths was ≈ 0.1 over 300 years.
 - The defaults are now a damped, noise-driven oscillator: **R = −0.006, γ = 0.0156, σ = 0.03**.
 - That gives a CV of ≈ 0.3 (0.32 and 0.27 for two seeds over 300 years), about 3× the first guess, close to observed ENSO.
 - Period: 3.6–3.8 years. std(Tₑ): ≈ 0.28.
@@ -174,7 +174,7 @@ The step is δᵢ = 0.5 sᵢ: large enough to beat the sampling noise, and smoot
 
 **Scores against the truth, by lead:** pattern correlation and relative RMS error over the 38 slow variables, plus the components for Tₑ and h, and cost.
 
-Code: `DifferentiableEarth/src/sensitivity.jl`, `drivers/toy_sensitivity_comparison.jl`, `plots/sensitivity_comparison_pluto.jl`.
+Code: `PredictableOcean/src/sensitivity.jl`, `drivers/toy_sensitivity_comparison.jl`, `plots/sensitivity_comparison_pluto.jl`.
 
 ### 4.1 First results (2026-11-16, `run/toy-sensitivity/`)
 4 initial states; truth from 200 paired members with δ = 0.5 s; ensemble-mean adjoint from the same 200 members; regression from 400 members; LIM fit to 50 years.

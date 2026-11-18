@@ -28,7 +28,7 @@ function git_info(dir::AbstractString)
 end
 
 const PROVENANCE_PACKAGES = ("Reactant", "Enzyme", "Oceananigans", "SpeedyWeather", "NumericalEarth",
-                             "ConservativeRegridding", "DifferentiableEarth", "NCDatasets")
+                             "ConservativeRegridding", "PredictableOcean", "NCDatasets")
 
 function package_versions()
     # read the active Manifest directly (no dependence on which packages are installed)
@@ -49,7 +49,7 @@ Global attributes recording where a file came from: git commit, branch and dirty
 repository, the driver path and its settings block, Julia and package versions, host and date.
 """
 function provenance(; driver::AbstractString = "", settings::AbstractString = "", title::AbstractString = "")
-    repo = dirname(dirname(@__DIR__))   # DifferentiableEarth/src -> repository root
+    repo = dirname(dirname(@__DIR__))   # PredictableOcean/src -> repository root
     g = git_info(repo)
     return Dict{String, Any}(
         "Conventions" => "CF-1.10",
@@ -64,7 +64,7 @@ function provenance(; driver::AbstractString = "", settings::AbstractString = ""
         "host" => gethostname(),
         "arch" => string(Sys.ARCH),
         "created" => string(Dates.now()),
-        "history" => string(Dates.now(), ": written by DifferentiableEarth"),
+        "history" => string(Dates.now(), ": written by PredictableOcean"),
     )
 end
 

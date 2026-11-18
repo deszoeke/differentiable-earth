@@ -28,7 +28,7 @@ using Oceananigans, Reactant, Enzyme
 using Oceananigans.Architectures: ReactantState
 using CUDA   # Reactant compiles KernelAbstractions kernels through its CUDA extension, even on CPU (deferred: CUDA.jl not yet in the environment)
 using Reactant: @trace
-using DifferentiableEarth: provenance, settings_block
+using PredictableOcean: provenance, settings_block
 using LinearAlgebra, Random, Statistics, NCDatasets, Printf
 Reactant.set_default_backend("cpu")
 

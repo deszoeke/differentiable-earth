@@ -30,4 +30,4 @@ done
 
 echo "== package tests"
 cd "$repo"
-julia +1.11 --project=. DifferentiableEarth/test/runtests.jl
+julia +1.11 --project=. PredictableOcean/test/runtests.jl

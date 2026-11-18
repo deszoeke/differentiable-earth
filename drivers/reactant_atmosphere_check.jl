@@ -26,7 +26,7 @@ outfile      = "reactant_atmosphere_check.nc"
 
 using SpeedyWeather, Reactant, Enzyme
 using CUDA   # Reactant compiles KernelAbstractions kernels through its CUDA extension, even on CPU (deferred: CUDA.jl not yet in the environment)
-using DifferentiableEarth: provenance, settings_block
+using PredictableOcean: provenance, settings_block
 using LinearAlgebra, NCDatasets, Printf, Random
 Reactant.set_default_backend("cpu")
 

@@ -24,7 +24,7 @@ outfile        = "coupled_smoke.nc"
 
 using Oceananigans, SpeedyWeather, ConservativeRegridding, NumericalEarth
 using Oceananigans.Units
-using DifferentiableEarth: provenance, settings_block
+using PredictableOcean: provenance, settings_block
 using NCDatasets, Printf
 
 t_build = @elapsed begin

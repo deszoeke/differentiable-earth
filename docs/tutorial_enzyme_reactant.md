@@ -1,10 +1,10 @@
 # Tutorial: automatic differentiation with Enzyme and Reactant (toy model)
 
 Goal: get from "what is a gradient of a forecast?" to working, verified tangent-linear and adjoint products of a time-stepping model, in plain Julia (Enzyme) and compiled (Reactant). Everything here runs on the toy model in a few minutes.
-- **Code:** `DifferentiableEarth/src/ad.jl` and `propagator.jl`.
+- **Code:** `PredictableOcean/src/ad.jl` and `propagator.jl`.
 - **Driver:** `drivers/tutorial_ad.jl`, run in `run/tutorial-ad/`.
 - **Plots:** `plots/tutorial_ad_pluto.jl`.
-- **Tests:** `DifferentiableEarth/test/test_ad.jl` and `test_reactant.jl`.
+- **Tests:** `PredictableOcean/test/test_ad.jl` and `test_reactant.jl`.
 - **Background:** `docs/technical.md` §3.
 
 ## 1. What we differentiate
@@ -15,7 +15,7 @@ M = `propagate(m, ·, n)` maps an initial state x(0) (74 numbers: X₁…₃₆,
 
 ## 2. Plain Enzyme
 ```julia
-using DifferentiableEarth
+using PredictableOcean
 m  = ToyCoupled()
 x0 = propagate(m, initial_state(m), 2000)          # a state on the attractor
 Lv  = jvp(m, x0, v, 56)                             # TLM, 2 weeks

@@ -20,7 +20,7 @@ nlayers        = 8
 #####
 
 using NumericalEarth, SpeedyWeather, Oceananigans, ConservativeRegridding
-using DifferentiableEarth
+using PredictableOcean
 using LinearAlgebra, SparseArrays, Random, Printf
 
 t = @elapsed c = build_coupled_model(; ocean_size, ocean_latitude, ocean_depth, truncation, nlayers)

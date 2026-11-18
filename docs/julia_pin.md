@@ -3,7 +3,7 @@
 ## What is pinned
 - **Mac:** `juliaup override set 1.11` in the repo, so `julia` here starts 1.11.9.
 - **HPC jobs:** `julia +1.11 ...` in every job script.
-- **`[compat]`:** `julia = "~1.11"` in `Project.toml` and `DifferentiableEarth/Project.toml`.
+- **`[compat]`:** `julia = "~1.11"` in `Project.toml` and `PredictableOcean/Project.toml`.
 - **`Manifest.toml`:** committed for the main environment, so every machine resolves identical Reactant/Enzyme/Oceananigans/SpeedyWeather versions.
 - **Not pinned:** `plots/`, which has its own environment and Jupyter kernel ("Julia 1.11 (diff-earth)") and no committed Manifest.
 

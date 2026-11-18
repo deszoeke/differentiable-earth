@@ -13,16 +13,16 @@ description: How to run, test, precompile and inspect Julia in the differentiabl
 ## Environments
 | Environment | Path | Contents |
 |---|---|---|
-| main / drivers | `Project.toml` (repo root) | `DifferentiableEarth` (path source), Reactant, Enzyme, model packages. Manifest **committed**. |
-| package | `DifferentiableEarth/Project.toml` | package deps and `[compat]` bounds; tests in `DifferentiableEarth/test/` |
+| main / drivers | `Project.toml` (repo root) | `PredictableOcean` (path source), Reactant, Enzyme, model packages. Manifest **committed**. |
+| package | `PredictableOcean/Project.toml` | package deps and `[compat]` bounds; tests in `PredictableOcean/test/` |
 | plotting | `plots/Project.toml` | CairoMakie, GeoMakie, NCDatasets, Revise, IJulia; no model packages; Manifest not committed |
 
 ## Commands
 | To | Run |
 |---|---|
 | instantiate on a new machine | `julia --project=. -e 'using Pkg; Pkg.instantiate()'` |
-| run the package tests | `julia --project=DifferentiableEarth -e 'using Pkg; Pkg.test()'` |
-| run one test file quickly | `julia --project=. DifferentiableEarth/test/<file>.jl` |
+| run the package tests | `julia --project=PredictableOcean -e 'using Pkg; Pkg.test()'` |
+| run one test file quickly | `julia --project=. PredictableOcean/test/<file>.jl` |
 | run a driver | `cd run/<name> && julia --project=../.. <driver>.jl` |
 | package versions in use | `julia --project=. -e 'using Pkg; Pkg.status()'` |
 | where a package's source is | `julia --project=. -e 'using Pkg; println(pkgdir(Base.require(Main, :Oceananigans)))'` |

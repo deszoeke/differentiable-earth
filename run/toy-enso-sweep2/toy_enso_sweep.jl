@@ -21,8 +21,8 @@ other_params = (;)                               # other ToyParams overrides hel
 ##### Setup
 #####
 
-using DifferentiableEarth
-using DifferentiableEarth: cycle_stats, monthly_means
+using PredictableOcean
+using PredictableOcean: cycle_stats, monthly_means
 using Random, NCDatasets
 
 day = 0.2

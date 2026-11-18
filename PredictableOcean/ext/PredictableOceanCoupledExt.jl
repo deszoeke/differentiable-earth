@@ -1,12 +1,12 @@
-module DifferentiableEarthCoupledExt
+module PredictableOceanCoupledExt
 
 # Coupled-model code that needs NumericalEarth, SpeedyWeather, Oceananigans and
 # ConservativeRegridding. Loaded automatically when all four are loaded alongside
-# DifferentiableEarth, so `using DifferentiableEarth` alone stays fast for toy-model work.
+# PredictableOcean, so `using PredictableOcean` alone stays fast for toy-model work.
 
-using DifferentiableEarth
-using DifferentiableEarth: RegriddingWeights
-import DifferentiableEarth: build_coupled_model, regridding_weights
+using PredictableOcean
+using PredictableOcean: RegriddingWeights
+import PredictableOcean: build_coupled_model, regridding_weights
 using NumericalEarth, SpeedyWeather, Oceananigans, ConservativeRegridding
 using SparseArrays
 

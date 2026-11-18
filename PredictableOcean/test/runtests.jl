@@ -1,5 +1,5 @@
 using Test
-using DifferentiableEarth
+using PredictableOcean
 using Random
 using Statistics
 using LinearAlgebra
@@ -9,7 +9,7 @@ if TEST_REACTANT
     using Reactant
 end
 
-@testset "DifferentiableEarth" begin
+@testset "PredictableOcean" begin
     include("test_toy.jl")
     include("test_ad.jl")
     TEST_REACTANT && include("test_reactant.jl")

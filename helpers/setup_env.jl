@@ -27,12 +27,12 @@ analysis = [
 ]
 
 # package environment
-Pkg.activate(joinpath(repo, "DifferentiableEarth"))
+Pkg.activate(joinpath(repo, "PredictableOcean"))
 Pkg.add(vcat(model, analysis))
 
 # main / driver environment: the package (path source) plus the model packages for drivers
 Pkg.activate(repo)
-Pkg.develop(path = joinpath(repo, "DifferentiableEarth"))
+Pkg.develop(path = joinpath(repo, "PredictableOcean"))
 Pkg.add(vcat(model, [PackageSpec(name = "NCDatasets")]))
 
 Pkg.precompile()

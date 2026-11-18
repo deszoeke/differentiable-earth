@@ -31,7 +31,7 @@ API details change between versions. Before relying on a signature, check it aga
 - Smooth non-differentiable switches where gradients matter (softplus or sigmoid with a sharpness parameter); keep the original as an option.
 - For gradient checks on GPU, use Float64 or turn TF32 off: XLA uses TF32 for Float32 matrix products by default.
 
-## Required tests (in `DifferentiableEarth/test/`)
+## Required tests (in `PredictableOcean/test/`)
 Every propagator (toy, atmosphere, ocean, coupled) gets all four tests:
 1. **Finite differences.** For a random direction `v`, check `(J(x+εv) − J(x−εv))/(2ε) ≈ ⟨∇J, v⟩`, with ε swept over about 1e-2 to 1e-8. Expect agreement in a V-shaped window. Use Float64.
 2. **Dot-product (adjoint) test.** For random `δx` and `λ`, check `⟨M δx, λ⟩ ≈ ⟨δx, Mᵀ λ⟩` to near round-off, using the state metric W if adjoints are taken in a weighted norm.

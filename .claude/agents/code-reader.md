@@ -9,7 +9,7 @@ You look things up and report what you found, briefly and exactly. You don't edi
 
 ## Where things are
 - **This project** (your working directory; on the HPC it is `/ceoas/deszoeks/projects/differentiable-earth`):
-  - `DifferentiableEarth/src/`: the package. `toy/` is the toy model, `coupled/` the coupled model (state, regridding, Reactant coupling), `phenomena/` the phenomenon registry; also `covariance.jl`, `predictability.jl`, `targeting.jl`, `assimilation.jl`, `io.jl`.
+  - `PredictableOcean/src/`: the package. `toy/` is the toy model, `coupled/` the coupled model (state, regridding, Reactant coupling), `phenomena/` the phenomenon registry; also `covariance.jl`, `predictability.jl`, `targeting.jl`, `assimilation.jl`, `io.jl`.
   - `drivers/`: run scripts, each with a `##### Settings` block.
   - `plots/`: plotting (`readers.jl`, `plotlib.jl`, notebooks paired with `.jl` files).
   - `docs/`, `notes/STATUS.md`, `CLAUDE.md`.

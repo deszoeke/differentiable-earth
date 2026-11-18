@@ -1,11 +1,11 @@
 ---
 name: add-phenomenon
-description: Steps for adding a new phenomenon (ENSO, PDO, NAM, SAM, PNA, MJO, MHW, AR, a seasonal regional outcome, ...) to the DifferentiableEarth phenomenon registry, so it can be selected, filtered, skill-scored, and used in predictability and targeting analyses. Use whenever a new target index or pattern is requested.
+description: Steps for adding a new phenomenon (ENSO, PDO, NAM, SAM, PNA, MJO, MHW, AR, a seasonal regional outcome, ...) to the PredictableOcean phenomenon registry, so it can be selected, filtered, skill-scored, and used in predictability and targeting analyses. Use whenever a new target index or pattern is requested.
 ---
 
 # Adding a phenomenon
 
-Every analysis (covariance, predictability, targeting, OSSE) is written against the `Phenomenon` interface in `DifferentiableEarth/src/phenomena/`. Adding a target means adding one definition plus a test, without touching the analysis code.
+Every analysis (covariance, predictability, targeting, OSSE) is written against the `Phenomenon` interface in `PredictableOcean/src/phenomena/`. Adding a target means adding one definition plus a test, without touching the analysis code.
 
 ## 1. Define it: `src/phenomena/<name>.jl`
 A `struct <Name> <: Phenomenon` holding its parameters, plus methods for the interface:

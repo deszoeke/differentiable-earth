@@ -21,8 +21,8 @@ other_params = (γ = 0.0156,)                               # other ToyParams ov
 ##### Setup
 #####
 
-using DifferentiableEarth
-using DifferentiableEarth: cycle_stats, monthly_means
+using PredictableOcean
+using PredictableOcean: cycle_stats, monthly_means
 using Random, NCDatasets
 
 day = 0.2

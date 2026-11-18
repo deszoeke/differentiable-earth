@@ -93,7 +93,7 @@ function load_regridding_weights(path::AbstractString)
     end
 end
 
-# Implemented in the DifferentiableEarthCoupledExt extension (load NumericalEarth, SpeedyWeather,
+# Implemented in the PredictableOceanCoupledExt extension (load NumericalEarth, SpeedyWeather,
 # Oceananigans and ConservativeRegridding to activate it).
 
 """

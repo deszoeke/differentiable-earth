@@ -2,7 +2,7 @@
 
 julia_version = "1.11.9"
 manifest_format = "2.0"
-project_hash = "7b118bf9530bfd065139a903b3d48c0665c089f2"
+project_hash = "cb194c71f0461406f541f6752248bc736516b5a3"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -559,16 +559,6 @@ deps = ["IrrationalConstants", "LogExpFunctions", "NaNMath", "Random", "SpecialF
 git-tree-sha1 = "6a4a3d254ca35fe9b35e456c66589228514d6a01"
 uuid = "b552c78f-8df3-52c6-915a-8e097449b14b"
 version = "1.18.0"
-
-[[deps.DifferentiableEarth]]
-deps = ["Dates", "Enzyme", "KrylovKit", "LinearAlgebra", "NCDatasets", "PrecompileTools", "Random", "Reactant", "ReactantCore", "SparseArrays", "Statistics", "TOML"]
-path = "DifferentiableEarth"
-uuid = "aca69edf-505a-48c2-8262-fff1a8cbc812"
-version = "0.1.0"
-weakdeps = ["ConservativeRegridding", "NumericalEarth", "Oceananigans", "SpeedyWeather"]
-
-    [deps.DifferentiableEarth.extensions]
-    DifferentiableEarthCoupledExt = ["ConservativeRegridding", "NumericalEarth", "Oceananigans", "SpeedyWeather"]
 
 [[deps.DiskArrays]]
 deps = ["ConstructionBase", "LRUCache", "Mmap", "OffsetArrays"]
@@ -1653,6 +1643,16 @@ deps = ["Preferences"]
 git-tree-sha1 = "5aa36f7049a63a1528fe8f7c3f2113413ffd4e1f"
 uuid = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
 version = "1.2.1"
+
+[[deps.PredictableOcean]]
+deps = ["Dates", "Enzyme", "KrylovKit", "LinearAlgebra", "NCDatasets", "PrecompileTools", "Random", "Reactant", "ReactantCore", "SparseArrays", "Statistics", "TOML"]
+path = "PredictableOcean"
+uuid = "f8f788c7-217c-478c-b1b3-a45b98011cb5"
+version = "0.1.0"
+weakdeps = ["ConservativeRegridding", "NumericalEarth", "Oceananigans", "SpeedyWeather"]
+
+    [deps.PredictableOcean.extensions]
+    PredictableOceanCoupledExt = ["ConservativeRegridding", "NumericalEarth", "Oceananigans", "SpeedyWeather"]
 
 [[deps.Preferences]]
 deps = ["TOML"]
