@@ -56,11 +56,11 @@ _Last updated 2026-11-15._
   - a 500-year nature run takes about 30 days of wall time as one 8-core job, so single long runs need speed-ups.
   - Likely speed-ups: a longer coupled Δt with the atmosphere sub-stepped (the ocean currently steps every 40 min); thread scaling; GPU.
 - **Ensemble sampling** (user's point, 2026-11-17):
-  - pooled over 4 seasons × 20 years of starts, the 30-member ensembles give about 2300 degrees of freedom for the **noise** covariance Σ(T) at every lead (29 per start × 80 starts). That is ample for strongly coupled cross-covariances, though seasonal and state dependence reduce it (about 580 per season).
+  - pooled over 4 seasons × 20 years of starts, the 30-member ensembles give about 2300 degrees of freedom for the **noise** covariance Σ(τ) at every lead (29 per start × 80 starts). That is ample for strongly coupled cross-covariances, though seasonal and state dependence reduce it (about 580 per season).
   - The **signal** covariance and the climatological C(0) and C(τ) have only about 80 correlated ensemble-mean samples, so the effective number is the count of independent slow states. These need the long nature run.
   - The coupled state is 10⁵–10⁶ variables, so analysis works in a reduced space of about 100–300 EOFs.
 - **Decadal predictability** (idea, not yet in the plan):
-  - extrapolate with the LIM, G(τ) = C(τ) C(0)⁻¹ = exp(Lτ), Q = −(L C0 + C0 Lᵀ), with the τ-test;
+  - extrapolate with the LIM, G(τ) = C(τ) C(0)⁻¹ = exp(Lτ), Q = −(L C(0) + C(0) Lᵀ), with the τ-test;
   - diagnostic potential predictability from a several-century control run with realistic geometry;
   - check against a few 10-year ensembles. Caveat: AMOC and decadal ocean physics at 2°.
 - **Literature:** `docs/novelty.md` (assessment) and `docs/references.md` (56 AMS-style references with DOIs). Consensus thread: https://consensus.app/search/literature-review-to-assess-the-novelty-of-a-plann/uihD0upqS4-DK0PLLx3Jsg/ . The Elicit connector is unavailable (no API access on the plan).

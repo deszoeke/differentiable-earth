@@ -17,7 +17,7 @@ Most individual components are established. The novelty lies in their combinatio
    - The problem: emulators are verified against reanalysis, where the true predictability is unknown.
    - What's new: in a perfect-model coupled system, large physics ensembles give the true predictability (spread, predictable components, APT, optimal growth, by lead, season and phenomenon), including the coupled ocean–atmosphere covariance. Emulators are scored against it.
 2. **Emulators whose spread cannot collapse, by construction.**
-   - A stochastic residual with covariance Q = −(L C₀ + C₀ Lᵀ), from the fluctuation–dissipation relation for the strongly coupled covariance, refined by AD-calibrated noise (reparameterization trick).
+   - A stochastic residual with covariance Q = −(L C(0) + C(0) Lᵀ), from the fluctuation–dissipation relation for the strongly coupled covariance, refined by AD-calibrated noise (reparameterization trick).
    - This links LIM noise theory to ML emulators and targets their under-dispersion.
 3. **The strongly coupled covariance through lead time, not only at analysis time.**
    - Do the least-damped coupled modes, the optimal-growth structures and the nonlinear predictable components agree, and where do they diverge?

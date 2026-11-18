@@ -5,8 +5,8 @@ The goal is a perfect-model study of how predictable the coupled ocean–atmosph
 
 Two outcomes:
 0. **Modular phenomenon framework.** Choose and filter targets (ENSO, PDO, NAM/SAM, PNA, seasonal regional outcomes, MJO, MHWs, ARs), then measure skill for each one. Coarse, well-resolved modes come first. How well the model resolves finer phenomena (e.g. the MJO), and how much that affects the coarse modes, is itself a result.
-1. **Strongly coupled covariance.** Build B with the full ocean–atmosphere cross-covariance. Derive modes of variability from it, and compare them with the dynamical modes of the tangent-linear propagator M(T).
-2. **Idealized targeting system.** Given the current state and an index J (Niño-3.4, PDO, …) at lead T, predict where and in which season extra observations would most reduce the forecast variance of J. Validate the predictions with OSSEs.
+1. **Strongly coupled covariance.** Build the nature-run covariance C(τ) and the forecast covariance Σ(τ) with the full ocean–atmosphere cross-covariance. Derive modes of variability from them, and compare them with the dynamical modes of the propagator. (Notation: `docs/technical.md`, Notation.)
+2. **Idealized targeting system.** Given the current state and an index J (Niño-3.4, PDO, …) at lead τ, predict where and in which season extra observations would most reduce the forecast variance of J. Validate the predictions with OSSEs.
 
 The directory currently holds only `test_NumericalEarth.jl`, which has never run (SpeedyWeather and NumericalEarth are not installed). Hardware: M3 Pro with 36 GB, no CUDA. Develop on the laptop CPU at coarse resolution, and write code that can move to a GPU cluster through Reactant.
 
@@ -33,7 +33,7 @@ The directory currently holds only `test_NumericalEarth.jl`, which has never run
 
 ## Key scientific design choice
 At leads beyond about 2 weeks, the atmospheric tangent-linear model loses validity: chaos makes gradients explode. Two complementary tools follow from this:
-- **Ensemble statistics** are the backbone at long leads: flow-dependent B, forecast covariance P(T), and ensemble sensitivity (Ancell & Hakim). They are robust and need no AD.
+- **Ensemble statistics** are the backbone at long leads: the forecast covariance Σ(τ), and ensemble sensitivity (Ancell & Hakim). They are robust and need no AD.
 - **AD (adjoint/JVP)** has three roles:
   - exact sensitivities and singular vectors at leads where M is valid (days to about 1 month for the atmosphere; months for ocean-initialized perturbations);
   - **ensemble-averaged adjoints** at longer leads: averaging ∇J over ensemble members filters out the chaotic atmospheric growth;
@@ -53,7 +53,7 @@ Each AD estimate is cross-checked against its ensemble counterpart. Where they d
   - Coarse default: T31L8 Speedy, coupled to a 20-level Oceananigans ocean.
   - The ocean uses `ExplicitFreeSurface` (or split-explicit for forward-only runs) and a cheap closure, not CATKE, for AD.
   - **The ocean grid is refined in the equatorial waveguide.** It uses a `LatitudeLongitudeGrid` with stretched latitude spacing: about 0.5° or finer within ±10°, relaxing to 2° poleward. Refinement is a parameter, so it can be swept.
-- `src/io.jl`: all output (nature run, ensembles, B factors, modes, gradients, singular vectors, targeting maps, OSSE results) goes to **NetCDF via NCDatasets**, with CF-style metadata. Each file records the configuration and the package versions from the Manifest, for provenance.
+- `src/io.jl`: all output (nature run, ensembles, covariance factors, modes, gradients, singular vectors, targeting maps, OSSE results) goes to **NetCDF via NCDatasets**, with CF-style metadata. Each file records the configuration and the package versions from the Manifest, for provenance.
 - `src/state.jl`: `CoupledState`, with `flatten`/`unflatten` between model fields and a vector `x`.
   - Atmosphere: spectral vor, div, T, q, ln ps. Ocean: T, S, u, v, η.
   - Metrics: total-energy norm (atmosphere plus ocean heat content and kinetic energy), area and volume weights, and masks.
@@ -61,7 +61,7 @@ Each AD estimate is cross-checked against its ensemble counterpart. Where they d
   - **Each `Phenomenon` holds:**
     - the variables and region it needs;
     - a filter: time averaging or band-pass (e.g. seasonal means, 20–100-day band), spatial smoothing, and season or start-month selection;
-    - a differentiable index functional `J(x)` for adjoints and singular vectors, plus a pattern for projecting B and ensembles;
+    - a differentiable index functional `J(x)` for adjoints and singular vectors, plus a pattern for projecting covariances and ensembles;
     - metrics: ensemble skill (anomaly correlation, RMSE against spread, signal-to-noise, predictable component) and whether the nature run resolves the phenomenon.
   - **Patterns are learned from the model's own nature run** (EOF or regression patterns), not from observations. That keeps the perfect-model study self-consistent. A comparison with observed patterns is reported as a diagnostic.
   - **Tier 1, coarse modes likely to be resolved (do first):** ENSO (Niño-3.4, plus a coupled SST/thermocline index), PDO, NAM/AO, SAM, PNA, seasonal-mean surface temperature and precipitation in user-chosen regions (seasonal forecast outcomes).
@@ -75,19 +75,19 @@ Each AD estimate is cross-checked against its ensemble counterpart. Where they d
 - **Gate, using the registry's `resolved` diagnostic:** Tier 1 phenomena must be present (realistic spectrum, pattern and seasonality) before predictability work starts. Tier 2–3 phenomena are assessed in the same way. A weak or absent MJO, AR or MHW is recorded as a finding, not a blocker.
 - `experiments/01_nature_run.jl`, `02_variability_diagnostics.jl`.
 
-### 3. Strongly coupled covariance B and modes (outcome 1)
-- `src/covariance.jl`: a low-rank B = X Xᵀ/(N−1), with ensemble or anomaly matrices stored as factors (never as the dense matrix).
-  - **Climatological, seasonally varying B** from nature-run anomalies.
-  - **Flow-dependent B** from an ensemble of perturbed starts.
+### 3. Strongly coupled covariance and modes (outcome 1)
+- `src/covariance.jl`: low-rank covariances X Xᵀ/(N−1), with ensemble or anomaly matrices stored as factors (never as the dense matrix).
+  - **Nature-run covariance C(τ; month)**, seasonally varying, from nature-run anomalies.
+  - **Forecast covariance Σ(τ; t)** from an ensemble of perturbed starts.
   - Optional ocean–atmosphere localization through a Schur product applied by matrix-free products. Cross-blocks are kept in full: strong coupling is the point.
 - **Modes:**
-  - coupled EOFs (leading eigenvectors of B in the energy norm);
+  - coupled EOFs (leading eigenvectors of C(0) in the energy norm);
   - a linear inverse model (LIM) and principal oscillation patterns (POPs) from lag covariances C(τ)C(0)⁻¹;
-  - singular vectors of M(T) weighted by B (phase 5).
-  - Compare the three: are B's ENSO and PDO modes the same as the optimal-growth modes?
+  - singular vectors of M′(τ) weighted by Σ(0) (phase 5).
+  - Compare the three: are C(0)'s ENSO and PDO modes the same as the optimal-growth modes?
 - `experiments/03_coupled_covariance.jl`.
 
-### 4. Differentiable propagator M(T) (engineering core)
+### 4. Differentiable propagator M(τ) (engineering core)
 Work up in this order, with gradient tests at every step:
 1. Atmosphere alone (Reactant, `PrimitiveWetModel`, prescribed SST).
 2. Ocean alone (Reactant, prescribed fluxes).
@@ -96,7 +96,7 @@ Work up in this order, with gradient tests at every step:
    - At compile time, pass the weights to the Reactant-compiled step as **constant sparse or banded operators**. Regridding is then a fixed linear map, which is trivially differentiable: the adjoint is the transpose. That removes all regridder construction, host loops and `@warn` from the traced `time_step!`.
    - Check that the weights conserve flux (row and column sums against cell areas) and that the transpose gives the adjoint.
    - Upstream the result to NumericalEarth if possible.
-4. Coupled model: `jvp(x, δx; T)` and `vjp(x, λ; T)` functions, compiled once with `Reactant.Binomial` checkpointing and the step count as a device number.
+4. Coupled model: `jvp(x, δx; τ)` and `vjp(x, z; τ)` functions, compiled once with `Reactant.Binomial` checkpointing and the step count as a device number.
 - Check against plain Enzyme on 1.11 for small cases.
 
 ### 4b. Physics trade-off between differentiability and nonlinear realism (science and engineering target)
@@ -118,26 +118,26 @@ SpeedyWeather's convection and large-scale condensation are simple threshold sch
 - The output is a recommended resolution for the differentiable coupled model, documented as a result.
 
 ### 5. Predictability analysis
-`src/predictability.jl`, `experiments/05_predictability.jl`. The analysis is generic over registered phenomena; run Tier 1 first, then Tiers 2–3. For each phenomenon J, lead T (from weeks for NAM/SAM to 1–24 months for ENSO/PDO) and start month:
-- Gradient g = Mᵀ∇J, both single-member and ensemble-averaged.
-- Linear forecast variance σ²_J(T) = gᵀ B g, compared with ensemble spread.
-- B-weighted singular vectors using KrylovKit `svdsolve`/`eigsolve` on B^{1/2} Mᵀ W M B^{1/2}.
+`src/predictability.jl`, `experiments/05_predictability.jl`. The analysis is generic over registered phenomena; run Tier 1 first, then Tiers 2–3. For each phenomenon J, lead τ (from weeks for NAM/SAM to 1–24 months for ENSO/PDO) and start month:
+- Gradient g = M′(τ)ᵀ∇J, both single-member and ensemble-averaged.
+- Linear forecast variance of J, gᵀ Σ(0) g, compared with ensemble spread.
+- Σ(0)-weighted singular vectors using KrylovKit `svdsolve`/`eigsolve` on Σ(0)^{1/2} M′ᵀ W M′ Σ(0)^{1/2}.
 - Predictable component and signal-to-noise as a function of lead and season, including the spring predictability barrier.
 
 ### 6. Targeted observations (outcome 2)
 `src/targeting.jl`, `experiments/06_targeting.jl`. For a candidate observation set H with error R, the reduction in forecast variance of J is
 
-ΔVar(J) = (Hb)ᵀ (H B Hᵀ + R)⁻¹ (Hb),  where b = B g.
+ΔVar(J) = (Hb)ᵀ (H Σ(0) Hᵀ + R)⁻¹ (Hb),  where b = Σ(0) g.
 
-- This needs one adjoint per (J, T, start date). Every candidate observation is then cheap to evaluate.
+- This needs one adjoint per (J, τ, start date). Every candidate observation is then cheap to evaluate.
 - Candidate platforms: Argo-like T/S profile, TAO-like mooring, satellite SST box, radiosonde or dropsonde.
-- Greedy selection of observation sets (serial ETKF-style update of B).
+- Greedy selection of observation sets (serial ETKF-style update of Σ(0)).
 - Outputs: maps of ΔVar by region and season, e.g. "deploy in the western Pacific in boreal spring to reduce variance of the December Niño-3.4 forecast". There is also an ensemble-only version (ensemble sensitivity / ETKF signal variance) to cross-check.
 
 ### 7. OSSE validation
 `src/assimilation.jl`, `experiments/07_osse.jl`.
 - Draw synthetic observations from the nature run under a baseline network, plus or minus the targeted additions.
-- Assimilate with a strongly coupled EnKF/ETKF (the B from phase 3), then run ensemble forecasts.
+- Assimilate with a strongly coupled EnKF/ETKF (the coupled ensemble covariance Σ from phase 3), then run ensemble forecasts.
 - Check that the actual reduction in J's forecast error matches the predicted ΔVar, and that targeted observations beat random placement of the same number.
 - 4D-Var using the Hessian is a later option.
 
@@ -287,7 +287,7 @@ differentiable-earth/
 - `docs/technical.md`: environment and versions, model configurations, the state vector and norms, precomputed regridding, Reactant/AD setup and checkpointing, the physics options, the NetCDF file conventions, and how to add a new `Phenomenon`.
 - `docs/results.md` (or `docs/results/<phase>.md`): scientific results for each phase. This includes:
   - which phenomena are resolved;
-  - coupled modes of B;
+  - coupled modes of C;
   - skill and predictability by phenomenon, lead and season;
   - the physics and resolution trade-offs;
   - targeting maps and OSSE validation.
@@ -302,13 +302,13 @@ differentiable-earth/
 - AD gives the *expected derivative*, but the target is the *derivative of the expected forecast*. In chaotic systems these differ, and averaging the derivative over an ensemble does not converge. The "ensemble-averaged adjoint at long leads" idea in this plan is **dropped**.
 
 **Revised roles:**
-1. **Coupled tangent-linear and adjoint models over short windows** (up to about 1–2 weeks, the TLM-valid window): exact sensitivities, short-range B-weighted singular vectors, 4D-Var-style analysis, and targeting for weather and subseasonal targets (ARs, MJO-event onset, PNA/NAM regimes).
+1. **Coupled tangent-linear and adjoint models over short windows** (up to about 1–2 weeks, the TLM-valid window): exact sensitivities, short-range Σ(0)-weighted singular vectors, 4D-Var-style analysis, and targeting for weather and subseasonal targets (ARs, MJO-event onset, PNA/NAM regimes).
 2. **Ocean-only adjoint (Oceananigans) under prescribed atmospheric forcing:** climatological plus stochastic, or a statistical atmosphere, with no dynamic atmosphere. A coarse-resolution ocean isn't chaotic, so the derivatives stay valid for months to years. This gives the sensitivity of ENSO/PDO metrics to the initial ocean state, validated against coupled ensembles.
-3. **Long-lead coupled response from statistics:** the fluctuation–dissipation response operator R(τ) ≈ C(τ) C(0)⁻¹, built from the strongly coupled lagged covariance (aim 1), with the LIM as one form. Long-lead targeting through ensemble-transform signal variance or ΔVar computed with R(τ) in place of the TLM.
+3. **Long-lead coupled response from statistics:** the fluctuation–dissipation response operator G(τ) = C(τ) C(0)⁻¹, built from the strongly coupled lagged covariance (aim 1), with the LIM as one form. Long-lead targeting through ensemble-transform signal variance or ΔVar computed with G(τ) in place of the TLM.
 4. **Hybrid / chaining:** a short-window adjoint, then a covariance-based response.
 5. **Reserve:** least-squares shadowing (LSS/NILSS) for exact derivatives of long-time statistics, if ever needed.
-6. **Jacobian about a fixed basic state (for linear and stochastic atmosphere models).** AD gives the exact tendency Jacobian A = ∂f/∂x evaluated at the climatological mean x̄. Unlike the trajectory TLM, this is a time-invariant operator. With eddy damping (Farrell & Ioannou), A is stable and non-normal: disturbances grow transiently, then decay.
-   - A driven by noise is a linear stochastic atmosphere. Its stochastic optimals and covariance can be compared with the coupled covariance B.
+6. **Jacobian about a fixed basic state (for linear and stochastic atmosphere models).** AD gives the exact tendency Jacobian A = ∂f/∂x evaluated at the nature-run mean state. Unlike the trajectory TLM, this is a time-invariant operator. With eddy damping (Farrell & Ioannou), A is stable and non-normal: disturbances grow transiently, then decay.
+   - A driven by noise is a linear stochastic atmosphere. Its stochastic optimals and covariance can be compared with the coupled covariance C(0).
    - Gradients of statistics over short windows can calibrate the damping and the noise.
    - Caveat: x̄ is not a model solution, and the damping is a modelling choice.
 
@@ -327,9 +327,9 @@ So the project centres on **large ensembles of a low-resolution strongly coupled
 1. **Physics ensembles:** large ensembles of the coupled model, NumericalEarth with SpeedyWeather and Oceananigans. These are the truth.
 2. **The strongly coupled covariance:** lagged covariances with the full ocean–atmosphere cross terms. From them:
    - **POP/LIM eigenmodes** of G(τ) = C(τ) C(0)⁻¹. The **least-damped modes** are the candidate predictable patterns (ENSO, PDO, …), with their coupled atmospheric parts.
-   - **Predictable component analysis** (Schneider & Griffies), a generalized eigenproblem between Σ(T), the forecast-ensemble covariance, and C, the climatological covariance. It uses the nonlinear ensemble directly.
+   - **Predictable component analysis** (Schneider & Griffies), a generalized eigenproblem between Σ(τ), the forecast-ensemble covariance, and C(0), the climatological covariance. It uses the nonlinear ensemble directly.
    - **Average predictability time** (DelSole & Tippett): predictability integrated over lead.
-   - **Response operators** by the fluctuation–dissipation relation, R(τ) ≈ C(τ) C(0)⁻¹.
+   - **Response operators** by the fluctuation–dissipation relation, G(τ) = C(τ) C(0)⁻¹.
    - **Optimal (transient) growth.** G is non-normal, so the least-damped mode is not necessarily the most important. Temporary constructive interference of more strongly damped, non-orthogonal modes can produce maximum amplification at a finite lead.
      - The **optimal initial structures** are the singular vectors of G(τ) = exp(Lτ), in a chosen norm, and their growth curve is max‖G(τ)‖ as a function of τ (Penland & Sardeshmukh 1995).
      - Predictable components and APT capture this automatically, because they are built from the forecast statistics rather than from eigenvalues.
@@ -339,10 +339,10 @@ So the project centres on **large ensembles of a low-resolution strongly coupled
    - **Probabilistic training:** proper scores (CRPS, energy score) on the physics ensembles.
    - **Split the state:**
      - an ML (nonlinear) drift on the slow, predictable subspace (the least-damped modes);
-     - a stochastic residual whose covariance obeys the fluctuation–dissipation constraint Q = −(L C₀ + C₀ Lᵀ), so the emulator's climatological variance is correct by construction and its spread cannot collapse.
+     - a stochastic residual whose covariance obeys the fluctuation–dissipation constraint Q = −(L C(0) + C(0) Lᵀ), so the emulator's climatological variance is correct by construction and its spread cannot collapse.
    - **Generative emulators,** such as score-based diffusion conditioned on the initial slow state, to produce ensembles directly.
    - **AD calibrates the emulator's noise.** The ML emulator is differentiable and much less chaotic than the physics, so AD can fit the structure and amplitude of its stochastic forcing directly. The method is the reparameterization trick: the noise is S(θ) ξ, with ξ sampled and held fixed during each gradient step.
-     - The loss is a proper ensemble score (CRPS or energy score) plus penalties for mismatch with C₀ and with the lagged covariances of the physics ensembles, over windows where the rollout gradients stay stable.
+     - The loss is a proper ensemble score (CRPS or energy score) plus penalties for mismatch with C(0) and with the lagged covariances of the physics ensembles, over windows where the rollout gradients stay stable.
      - The FDT relation supplies the starting value of Q; AD then refines it for the nonlinear drift.
      - Stochastic optimals, the forcing patterns that excite the most variance, come from the emulator's Jacobian.
    - **Verification against the physics ensembles:** spread–skill ratio, rank histograms, and spectra of the predictable components, the APT and the least-damped modes, all by lead and season.
@@ -362,7 +362,7 @@ Reactant is kept mainly for **GPU performance portability of the large ensembles
    - smoke test: done;
    - regridding weights: done, saved to NetCDF, adjoint = transpose;
    - next: a multi-decade nature run at low resolution, the realism check for each phenomenon tier, and a timing study (CPU, and later GPU through Reactant).
-3. **Large ensembles:** initialized from the nature run (perturbed atmosphere, perturbed ocean, or both), at several start seasons and leads up to 2 years. They supply forecast covariances Σ(T) and the climatological C.
+3. **Large ensembles:** initialized from the nature run (perturbed atmosphere, perturbed ocean, or both), at several start seasons and leads up to 2 years. They supply forecast covariances Σ(τ) and, with the nature run, the nature-run covariance C(τ).
 4. **Strongly coupled covariance and predictable modes:** POP/LIM, PCA, APT and response operators, by phenomenon (registry) and season.
 5. **Targeting and OSSEs** from ensemble or covariance statistics, plus the ocean-only adjoint for ocean observations.
 6. **ML emulation** of the slow subspace with calibrated stochastic residuals, verified against phases 3–4.
