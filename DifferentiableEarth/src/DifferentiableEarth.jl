@@ -24,6 +24,7 @@ export slow_indices, forecast_metric_series, ensemble_fd_sensitivity, ensemble_m
 export regression_sensitivity, fit_lim, lim_sensitivity
 export RegriddingWeights, regrid, regridding_checks, save_regridding_weights, load_regridding_weights
 export build_coupled_model, regridding_weights
+export predictable_components, predictive_information, pooled_forecast_covariance, lim_forecast_covariance
 
 include("propagator.jl")
 include("toy/toy_coupled.jl")
@@ -32,5 +33,6 @@ include("diagnostics.jl")
 include("ad.jl")
 include("sensitivity.jl")
 include("coupled/regridding.jl")
+include("predictability.jl")
 
 end # module
